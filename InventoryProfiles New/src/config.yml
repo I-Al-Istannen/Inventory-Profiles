@@ -1,0 +1,37 @@
+# If true the player will be teleported to the location they logged out at. If false, they will be send to the world spawn.
+teleport to old location upon login: true
+
+# The Language of the plugin
+language: en
+
+# The maximum playtime for a player
+max playtime: 2h
+
+# The delay before the playtime will reset
+playtime reset delay: 10s
+
+# The Pattern for the duration. dd ==> Days, hh ==> hours, mm ==> Minutes, ss ==> Seconds, SS ==> Milliseconds
+duration pattern: "ddd hhh mmm sss"
+
+# The minutes of playtime left that a warning should appear in chat.
+playtime warn at times in minutes:
+  - 10s
+  - 9s
+  - 8s
+  - 7s
+  - 6s
+  - 5s
+  - 4s
+  - 3s
+  - 2s
+  - 1s
+  - 1m
+  - 2m
+  - 5m
+  - 15m
+
+# How much of the original price should be refunded if the user sells a region. [0-1]
+region refund percentage: 0.5
+
+# If true, the logins and logouts from players will be logged in the console 
+log logins and logouts: true

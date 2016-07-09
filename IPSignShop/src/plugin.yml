@@ -1,0 +1,10 @@
+name: "IPSignShop"
+version: 0.1
+main: me.ialistannen.ip_sign_shop.IPSignShop
+depend: [InventoryProfiles]
+author: "I Al Istannen"
+commands:
+  ipsignshop:
+    usage: "&cUsage: /ipss help"
+    description: "The main command for Inventory Profile Sign Shop"
+    aliases: "ipss"

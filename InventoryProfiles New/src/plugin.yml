@@ -1,0 +1,10 @@
+name: "InventoryProfiles"
+version: 1.0
+main: me.ialistannen.inventory_profiles.InventoryProfiles
+softdepend: [Vault,WorldGuard,MultiWorld]
+author: "I Al Istannen"
+commands:
+  inventoryProfiles:
+    usage: "/inventoryProfiles help"
+    description: "The main command for InventoryProfiles"
+    aliases: "ip"

@@ -1,0 +1,12 @@
+# If true the item will be displayed above the chest
+use item display: true
+
+# If true ignores empty shops if searched with the /ipss find command
+find command ignore empty shops: true
+
+# If true it will show the item name above the item 
+show item displayname: true
+
+# The delay between shop updates. They are not needed for the function, they just restore items that went missing and update the sign.
+# I am sure you love maths, so it is in ticks. 1 second = 20 ticks. Good luck!
+delay between shop updates: 3600
