@@ -6,7 +6,7 @@ import java.util.Locale;
 
 import org.bukkit.command.CommandSender;
 
-import me.ialistannen.inventory_profiles.language.IPLanguage;
+import me.ialistannen.inventory_profiles.InventoryProfiles;
 import me.ialistannen.inventory_profiles.util.Util;
 
 /**
@@ -34,8 +34,8 @@ public class CommandLanguageSet extends CommandPreset {
 		
 		Locale locale = Locale.forLanguageTag(args[0]);
 		
-		IPLanguage.setLocale(locale);
-		sender.sendMessage(IPLanguage.tr("language set", IPLanguage.getLocale().getDisplayName()));
+		InventoryProfiles.getInstance().getLanguage().setLanguage(locale);
+		sender.sendMessage(Util.tr("language set", InventoryProfiles.getInstance().getLanguage().getLanguage().getDisplayName()));
 		
 		return true;
 	}

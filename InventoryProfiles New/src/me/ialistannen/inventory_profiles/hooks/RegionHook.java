@@ -13,10 +13,10 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 
-import me.ialistannen.inventory_profiles.language.IPLanguage;
 import me.ialistannen.inventory_profiles.players.Profile;
 import me.ialistannen.inventory_profiles.signs.BuySign;
 import me.ialistannen.inventory_profiles.util.LocationSerializable;
+import me.ialistannen.inventory_profiles.util.Util;
 
 /**
  * A Region hook. Provides support for Region protection Plugins
@@ -119,7 +119,7 @@ public interface RegionHook extends Hook {
 		 * @return The translated name for this region
 		 */
 		public String getTranslatedName() {
-			return IPLanguage.tr("region role " + this.name().toLowerCase());
+			return Util.tr("region role " + this.name().toLowerCase());
 		}
 		
 		/**

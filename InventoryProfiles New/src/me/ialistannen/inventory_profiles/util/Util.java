@@ -14,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import me.ialistannen.inventory_profiles.InventoryProfiles;
-import me.ialistannen.inventory_profiles.language.IPLanguage;
 import me.ialistannen.inventory_profiles.players.Profile;
 
 /**
@@ -159,7 +158,7 @@ public class Util {
 	 */
 	public static Optional<Double> getDouble(String input) {
 		try {
-			return Optional.of(NumberFormat.getNumberInstance(IPLanguage.getLocale()).parse(input).doubleValue());
+			return Optional.of(NumberFormat.getNumberInstance(InventoryProfiles.getInstance().getLanguage().getLanguage()).parse(input).doubleValue());
 		} catch (ParseException e) {
 			return Optional.empty();
 		}
@@ -236,5 +235,14 @@ public class Util {
 		}
 		
 		return builder.toString();
+	}
+	
+	/**
+	 * @param key The key to translate
+	 * @param formattingObjects The formatting objects
+	 * @return The formatted String
+	 */
+	public static String tr(String key, Object... formattingObjects) {
+		return color(InventoryProfiles.getInstance().getLanguage().tr(key, formattingObjects));
 	}
 }

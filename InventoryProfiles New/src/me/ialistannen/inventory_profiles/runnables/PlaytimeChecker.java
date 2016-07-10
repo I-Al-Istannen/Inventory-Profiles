@@ -1,5 +1,7 @@
 package me.ialistannen.inventory_profiles.runnables;
 
+import static me.ialistannen.inventory_profiles.util.Util.tr;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -14,7 +16,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import me.ialistannen.inventory_profiles.InventoryProfiles;
-import me.ialistannen.inventory_profiles.language.IPLanguage;
 import me.ialistannen.inventory_profiles.players.Profile;
 import me.ialistannen.inventory_profiles.util.Util;
 
@@ -62,6 +63,6 @@ public class PlaytimeChecker extends BukkitRunnable {
 	}
 
 	private void sendWarnMessage(Profile profile) {
-		profile.getPlayer().ifPresent(player -> player.sendMessage(IPLanguage.tr("playtime amount warn message", Util.formatDuration(profile.getPlaytimeLeft()))));
+		profile.getPlayer().ifPresent(player -> player.sendMessage(tr("playtime amount warn message", Util.formatDuration(profile.getPlaytimeLeft()))));
 	}
 }

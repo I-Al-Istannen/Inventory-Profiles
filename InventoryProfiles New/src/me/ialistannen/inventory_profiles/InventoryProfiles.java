@@ -1,5 +1,10 @@
 package me.ialistannen.inventory_profiles;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Locale;
+
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
@@ -12,7 +17,6 @@ import me.ialistannen.inventory_profiles.hooks.HookManager;
 import me.ialistannen.inventory_profiles.hooks.MoneyHook;
 import me.ialistannen.inventory_profiles.hooks.RegionHook;
 import me.ialistannen.inventory_profiles.hooks.RegionHook.RegionObject;
-import me.ialistannen.inventory_profiles.language.IPLanguage;
 import me.ialistannen.inventory_profiles.listener.BuySignListener;
 import me.ialistannen.inventory_profiles.listener.PlayerListener;
 import me.ialistannen.inventory_profiles.players.Profile;
@@ -22,6 +26,8 @@ import me.ialistannen.inventory_profiles.signs.BuySign;
 import me.ialistannen.inventory_profiles.signs.SignManager;
 import me.ialistannen.inventory_profiles.util.LocationSerializable;
 import me.ialistannen.inventory_profiles.util.Util;
+import me.ialistannen.languageSystem.I18N;
+import me.ialistannen.languageSystem.MessageProvider;
 
 /**
  * The main class for InventoryProfiles
@@ -35,7 +41,9 @@ public class InventoryProfiles extends JavaPlugin {
 	private RegionHook regionHook;
 	private CommandManager commandManager;
 	private SignManager signManager;
-		
+	
+	private MessageProvider language;
+	
 	@Override
 	public void onEnable() {
 		instance = this;
@@ -43,7 +51,20 @@ public class InventoryProfiles extends JavaPlugin {
 		
 		saveDefaultConfig();
 		
-		IPLanguage.copyMessageProperties(getDataFolder().toPath().resolve(IPLanguage.FOLDER_NAME), false);
+		{
+			Path languageFolderPath = getDataFolder().toPath().resolve("translations");
+			try {
+				Files.createDirectories(languageFolderPath);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			I18N.copyDefaultFiles("translations", languageFolderPath, false, this.getClass());
+			
+			language = new I18N("translations", languageFolderPath,
+					Locale.forLanguageTag(getConfig().getString("language")), getLogger(), getClassLoader(), "Messages");
+		}
+		
 		moneyHook = HookManager.getMoneyHook();
 		regionHook = HookManager.getRegionHook();
 		
@@ -77,6 +98,13 @@ public class InventoryProfiles extends JavaPlugin {
 		ConfigurationSerialization.registerClass(LocationSerializable.class);
 		ConfigurationSerialization.registerClass(RegionObject.class);
 		ConfigurationSerialization.registerClass(BuySign.class);
+	}
+	
+	/**
+	 * @return The {@link MessageProvider}
+	 */
+	public MessageProvider getLanguage() {
+		return language;
 	}
 	
 	/**

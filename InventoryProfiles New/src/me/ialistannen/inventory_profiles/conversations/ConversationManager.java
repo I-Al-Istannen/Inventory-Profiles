@@ -9,7 +9,7 @@ import org.bukkit.conversations.ConversationFactory;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import me.ialistannen.inventory_profiles.language.IPLanguage;
+import me.ialistannen.inventory_profiles.util.Util;
 
 /**
  * Manages conversations
@@ -69,7 +69,7 @@ public class ConversationManager {
 				abandonListener.conversationAbandoned(event);
 				activeConversations.remove(((Player) event.getContext().getForWhom()).getName());
 				if(!event.gracefulExit()) {
-					event.getContext().getForWhom().sendRawMessage(IPLanguage.tr("conversation cancelled"));
+					event.getContext().getForWhom().sendRawMessage(Util.tr("conversation cancelled"));
 				}
 			});
 			

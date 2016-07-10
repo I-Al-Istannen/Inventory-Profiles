@@ -1,14 +1,12 @@
 package me.ialistannen.inventory_profiles.conversations;
 
-import static me.ialistannen.inventory_profiles.language.IPLanguage.tr;
+import static me.ialistannen.inventory_profiles.util.Util.tr;
 
 import java.util.regex.Pattern;
 
 import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.Prompt;
 import org.bukkit.conversations.StringPrompt;
-
-import me.ialistannen.inventory_profiles.language.IPLanguage;
 
 /**
  * Wants the user to confirm something. The resulting boolean will be saved in the SessionData with the key "result".
@@ -17,8 +15,8 @@ import me.ialistannen.inventory_profiles.language.IPLanguage;
 public class ConfirmationConversation extends StringPrompt {
 
 	private String promptText;
-	private Pattern yesPattern = Pattern.compile(IPLanguage.tr("confirmation conversation yes"), Pattern.CASE_INSENSITIVE);
-	private Pattern noPattern = Pattern.compile(IPLanguage.tr("confirmation conversation no"), Pattern.CASE_INSENSITIVE);
+	private Pattern yesPattern = Pattern.compile(tr("confirmation conversation yes"), Pattern.CASE_INSENSITIVE);
+	private Pattern noPattern = Pattern.compile(tr("confirmation conversation no"), Pattern.CASE_INSENSITIVE);
 	
 	/**
 	 * Creates a new Instance.

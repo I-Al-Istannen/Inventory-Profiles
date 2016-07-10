@@ -13,8 +13,8 @@ import org.bukkit.block.Sign;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 import me.ialistannen.inventory_profiles.InventoryProfiles;
-import me.ialistannen.inventory_profiles.language.IPLanguage;
 import me.ialistannen.inventory_profiles.util.LocationSerializable;
+import me.ialistannen.inventory_profiles.util.Util;
 
 /**
  * A Sign to buy a region
@@ -123,7 +123,7 @@ public class BuySign implements ConfigurationSerializable {
 			return "INDEX TOO HIGH";
 		}
 		
-		return IPLanguage.tr("buy sign line " + (index + 1), getRegionID(), getPrice());
+		return Util.tr("buy sign line " + (index + 1), getRegionID(), getPrice());
 	}
 
 	/**
