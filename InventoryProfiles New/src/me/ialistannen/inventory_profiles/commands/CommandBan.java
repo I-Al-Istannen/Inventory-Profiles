@@ -45,7 +45,6 @@ public class CommandBan extends CommandNode {
 	
 	@Override
 	protected List<String> getTabCompletions(String input, List<String> wholeUserChat, CommandSender tabCompleter) {
-		System.out.println(wholeUserChat + " " + input + " " + wholeUserChat.size());
 		List<String> toReturn = new ArrayList<>();
 		if(wholeUserChat.size() == 2) {
 			toReturn.addAll(Util.getAllProfileNames());
