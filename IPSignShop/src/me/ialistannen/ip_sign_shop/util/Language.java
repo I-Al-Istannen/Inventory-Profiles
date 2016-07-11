@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 
 import org.bukkit.Material;
 
-import me.ialistannen.inventory_profiles.language.IPLanguage;
+import me.ialistannen.inventory_profiles.InventoryProfiles;
 import me.ialistannen.ip_sign_shop.IPSignShop;
 
 /**
@@ -66,7 +66,7 @@ public class Language {
 	public Language() {
 		instance = this;
 		fillDefault();
-		updateLocale(IPLanguage.getLocale());
+		updateLocale(InventoryProfiles.getInstance().getCurrentLocale());
 	}
 	
 	private void fillDefault() {

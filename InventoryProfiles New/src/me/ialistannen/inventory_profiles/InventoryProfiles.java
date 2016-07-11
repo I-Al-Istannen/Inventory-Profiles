@@ -101,6 +101,13 @@ public class InventoryProfiles extends JavaPlugin {
 	}
 	
 	/**
+	 * @return The language currently used by this plugin
+	 */
+	public Locale getCurrentLocale() {
+		return getLanguage().getLanguage();
+	}
+	
+	/**
 	 * @return The {@link MessageProvider}
 	 */
 	public MessageProvider getLanguage() {
