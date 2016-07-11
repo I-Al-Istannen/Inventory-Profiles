@@ -1,12 +1,13 @@
 package me.ialistannen.ip_sign_shop.commands;
 
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
+
 import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
 
 import me.ialistannen.ip_sign_shop.IPSignShop;
-import me.ialistannen.ip_sign_shop.util.Language;
 
 /**
  * Sends the help
@@ -27,7 +28,7 @@ public class CommandHelp extends CommandPreset {
 
 	@Override
 	public boolean execute(CommandSender sender, String[] args) {
-		sender.sendMessage(Language.tr(getIndentifier() + " header"));
+		sender.sendMessage(tr(getIndentifier() + " header"));
 		for (CommandPreset commandPreset : IPSignShop.getCommandManager().getAll()) {
 			sender.sendMessage(commandPreset.getDescription());
 			sender.sendMessage(commandPreset.getUsageMessage());

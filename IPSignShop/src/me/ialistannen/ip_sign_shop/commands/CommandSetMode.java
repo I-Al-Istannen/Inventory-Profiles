@@ -1,6 +1,7 @@
 package me.ialistannen.ip_sign_shop.commands;
 
-import static me.ialistannen.ip_sign_shop.util.Language.tr;
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.trItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,6 @@ import me.ialistannen.ip_sign_shop.IPSignShop;
 import me.ialistannen.ip_sign_shop.datastorage.Shop;
 import me.ialistannen.ip_sign_shop.datastorage.ShopMode;
 import me.ialistannen.ip_sign_shop.util.IPSignShopUtil;
-import me.ialistannen.ip_sign_shop.util.Language;
 
 /**
  * Allows the setting of the mode
@@ -58,12 +58,12 @@ public class CommandSetMode extends CommandPreset {
 		}
 		
 		if(targetBlock.getType() != Material.WALL_SIGN) {
-			player.sendMessage(tr("block not a sign", Language.translateItemName(targetBlock.getType())));
+			player.sendMessage(tr("block not a sign", trItem(targetBlock.getType())));
 			return true;
 		}
 		
 		if(!IPSignShop.getShopManager().hasShopAtLocation(targetBlock.getLocation())) {
-			player.sendMessage(tr("not a shop", Language.translateItemName(targetBlock.getType())));
+			player.sendMessage(tr("not a shop", trItem(targetBlock.getType())));
 			return true;
 		}
 		

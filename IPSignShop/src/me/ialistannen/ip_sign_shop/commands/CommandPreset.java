@@ -1,6 +1,6 @@
 package me.ialistannen.ip_sign_shop.commands;
 
-import static me.ialistannen.ip_sign_shop.util.Language.tr;
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
 
 import java.util.ArrayList;
 import java.util.List;

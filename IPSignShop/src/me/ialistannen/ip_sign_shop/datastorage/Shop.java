@@ -1,6 +1,7 @@
 package me.ialistannen.ip_sign_shop.datastorage;
 
-import static me.ialistannen.ip_sign_shop.util.Language.tr;
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.trItem;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,7 +20,6 @@ import org.bukkit.util.Vector;
 import me.ialistannen.inventory_profiles.util.LocationSerializable;
 import me.ialistannen.ip_sign_shop.IPSignShop;
 import me.ialistannen.ip_sign_shop.util.IPSignShopUtil;
-import me.ialistannen.ip_sign_shop.util.Language;
 
 /**
  * Represents a single shop
@@ -181,10 +181,10 @@ public class Shop implements ConfigurationSerializable {
 		
 		String[] lines = new String[4];
 		// owner, mode, item name, price
-		lines[0] = Language.tr("sign line 1", getOwner(), getMode().getShopModeName(), getItemName(), getPrice());
-		lines[1] = Language.tr("sign line 2", getOwner(), getMode().getShopModeName(), getItemName(), getPrice());
-		lines[2] = Language.tr("sign line 3", getOwner(), getMode().getShopModeName(), getItemName(), getPrice());
-		lines[3] = Language.tr("sign line 4", getOwner(), getMode().getShopModeName(), getItemName(), getPrice());
+		lines[0] = tr("sign line 1", getOwner(), getMode().getShopModeName(), getItemName(), getPrice());
+		lines[1] = tr("sign line 2", getOwner(), getMode().getShopModeName(), getItemName(), getPrice());
+		lines[2] = tr("sign line 3", getOwner(), getMode().getShopModeName(), getItemName(), getPrice());
+		lines[3] = tr("sign line 4", getOwner(), getMode().getShopModeName(), getItemName(), getPrice());
 
 		sign.setLine(0, lines[0]);
 		sign.setLine(1, lines[1]);
@@ -307,7 +307,7 @@ public class Shop implements ConfigurationSerializable {
 	public String getItemName() {	
 		return getItem().hasItemMeta() && getItem().getItemMeta().hasDisplayName()
 				? getItem().getItemMeta().getDisplayName()
-				: Language.translateItemName(getItem().getType());
+				: trItem(getItem().getType());
 	}
 	
 	/**

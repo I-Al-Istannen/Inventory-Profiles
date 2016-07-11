@@ -1,6 +1,6 @@
 package me.ialistannen.ip_sign_shop.listener;
 
-import static me.ialistannen.ip_sign_shop.util.Language.tr;
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,7 +21,7 @@ import me.ialistannen.ip_sign_shop.IPSignShop;
 import me.ialistannen.ip_sign_shop.conversations.GetTradingPriceConversation;
 import me.ialistannen.ip_sign_shop.datastorage.Shop;
 import me.ialistannen.ip_sign_shop.datastorage.ShopMode;
-import me.ialistannen.ip_sign_shop.util.Language;
+import me.ialistannen.ip_sign_shop.util.IPSignShopUtil;
 
 /**
  * Listens for the creation if a shop
@@ -72,7 +72,7 @@ public class CreationListener implements Listener {
 		
 		String itemName = (e.getItem().hasItemMeta() && e.getItem().getItemMeta().hasDisplayName())
 				? e.getItem().getItemMeta().getDisplayName()
-				: Language.translateItemName(e.getItem().getType());
+				: IPSignShopUtil.trItem(e.getItem().getType());
 		
 		final Location signLoc = e.getClickedBlock().getRelative(e.getBlockFace()).getLocation();
 

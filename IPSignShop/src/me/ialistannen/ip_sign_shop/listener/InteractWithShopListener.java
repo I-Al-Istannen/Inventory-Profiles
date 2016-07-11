@@ -1,6 +1,6 @@
 package me.ialistannen.ip_sign_shop.listener;
 
-import static me.ialistannen.ip_sign_shop.util.Language.tr;
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;

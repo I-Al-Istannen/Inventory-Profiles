@@ -1,6 +1,7 @@
 package me.ialistannen.ip_sign_shop.commands;
 
-import static me.ialistannen.ip_sign_shop.util.Language.tr;
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.trItem;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,7 +16,6 @@ import org.bukkit.util.Vector;
 import me.ialistannen.ip_sign_shop.IPSignShop;
 import me.ialistannen.ip_sign_shop.datastorage.Shop;
 import me.ialistannen.ip_sign_shop.util.IPSignShopUtil;
-import me.ialistannen.ip_sign_shop.util.Language;
 
 /**
  * Find the nearest shop selling the item
@@ -102,7 +102,7 @@ public class CommandFind extends CommandPreset {
 	private List<String> getMaterialNames() {
 		List<String> list = new ArrayList<>();
 		for(Material mat : Material.values()) {
-			list.add(clean(Language.translateItemName(mat)));
+			list.add(clean(trItem(mat)));
 		}
 		return list;
 	}
@@ -115,7 +115,7 @@ public class CommandFind extends CommandPreset {
 	 */
 	private Material getFromTranslation(String translated) {
 		for (Material material : Material.values()) {
-			String trans = Language.translateItemName(material);
+			String trans = trItem(material);
 			if(clean(trans).equals(clean(translated))) {
 				return material;
 			}

@@ -16,6 +16,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import me.ialistannen.ip_sign_shop.IPSignShop;
+
 /**
  * Some util methods
  */
@@ -231,5 +233,26 @@ public class IPSignShopUtil {
 		}
 		
 		return list;
+	}
+	
+	/**
+	 * Uses the default category, "Messages"
+	 * 
+	 * @param key The key to translate
+	 * @param formattingObjects The formatting objects
+	 * @return The translated String
+	 */
+	public static String tr(String key, Object... formattingObjects) {
+		return color(IPSignShop.getInstance().getLanguage().tr(key, formattingObjects));
+	}
+
+	/**
+	 * Translates an item name (uses "Items" category)
+	 * 
+	 * @param material The material to translate
+	 * @return The translated String
+	 */
+	public static String trItem(Material material) {
+		return color(IPSignShop.getInstance().getLanguage().translate(material.name(), "Items"));
 	}
 }

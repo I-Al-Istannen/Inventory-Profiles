@@ -1,6 +1,6 @@
 package me.ialistannen.ip_sign_shop.conversations;
 
-import static me.ialistannen.ip_sign_shop.util.Language.tr;
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -9,8 +9,8 @@ import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.Prompt;
 import org.bukkit.conversations.StringPrompt;
 
+import me.ialistannen.ip_sign_shop.IPSignShop;
 import me.ialistannen.ip_sign_shop.datastorage.ShopMode;
-import me.ialistannen.ip_sign_shop.util.Language;
 
 /**
  * The conversation prompting you for the amount of things you want to buy
@@ -53,7 +53,7 @@ public class GetBuyAmountConversation extends StringPrompt {
 	 * @return The parsed int or null if not a number.
 	 */
 	private Integer getInt(String input) {
-		NumberFormat format = NumberFormat.getNumberInstance(Language.getLocale());
+		NumberFormat format = NumberFormat.getNumberInstance(IPSignShop.getInstance().getLanguage().getLanguage());
 		format.setParseIntegerOnly(true);
 		
 		try {

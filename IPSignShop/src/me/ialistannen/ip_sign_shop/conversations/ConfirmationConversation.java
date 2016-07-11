@@ -1,6 +1,6 @@
 package me.ialistannen.ip_sign_shop.conversations;
 
-import static me.ialistannen.ip_sign_shop.util.Language.tr;
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
 
 import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.Prompt;

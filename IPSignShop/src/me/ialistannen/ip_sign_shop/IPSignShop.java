@@ -2,6 +2,7 @@ package me.ialistannen.ip_sign_shop;
 
 import java.io.FileNotFoundException;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.logging.Level;
 
@@ -27,7 +28,7 @@ import me.ialistannen.ip_sign_shop.listener.CreationListener;
 import me.ialistannen.ip_sign_shop.listener.DestroyListener;
 import me.ialistannen.ip_sign_shop.listener.InteractWithShopListener;
 import me.ialistannen.ip_sign_shop.listener.ProtectShopContentsListener;
-import me.ialistannen.ip_sign_shop.util.Language;
+import me.ialistannen.languageSystem.I18N;
 
 /**
  * The main class for the Quick Chest shop
@@ -40,11 +41,17 @@ public class IPSignShop extends JavaPlugin {
 	private ConversationCreator conversationCreator;
 	private CommandManager commandManager;
 	
+	private I18N language;
+	
 	@Override
 	public void onEnable() {
 		instance = this;
 		registerConfigurationSerializationClasses();
-		Language.copyMessageProperties(getDataFolder().toPath().resolve(Language.FOLDER_NAME), false);
+		{
+			Path langFolder = getDataFolder().toPath().resolve("translations");
+			I18N.copyDefaultFiles("translations", langFolder, false, getClass());
+			language = new I18N("translations", langFolder, InventoryProfiles.getInstance().getCurrentLocale(), getLogger(), getClassLoader(), "Messages", "Items");
+		}
 		
 		conversationCreator = new ConversationCreator(this);
 		
@@ -107,6 +114,13 @@ public class IPSignShop extends JavaPlugin {
 		getShopManager().despawnAllItems();
 	}
 
+	/**
+	 * @return The language
+	 */
+	public I18N getLanguage() {
+		return language;
+	}
+	
 	/**
 	 * @return The Shop manager
 	 */
