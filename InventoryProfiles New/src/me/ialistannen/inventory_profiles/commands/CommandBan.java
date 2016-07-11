@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.bukkit.command.CommandSender;
@@ -14,30 +15,46 @@ import org.bukkit.command.CommandSender;
 import me.ialistannen.inventory_profiles.InventoryProfiles;
 import me.ialistannen.inventory_profiles.players.Profile;
 import me.ialistannen.inventory_profiles.util.Util;
+import me.ialistannen.tree_command_system.CommandNode;
 
 /**
  * Lets you ban a player
  */
-public class CommandBan extends CommandPreset {
+public class CommandBan extends CommandNode {
 
+	
 	/**
-	 * A new {@link CommandBan} instance
+	 * New instance
 	 */
 	public CommandBan() {
-		super(Util.PERMISSION_PREFIX + ".ban", false);
+		super(tr("subCommandBan name"), tr("subCommandBan keyword"),
+				Pattern.compile(tr("subCommandBan pattern"), Pattern.CASE_INSENSITIVE),
+				Util.PERMISSION_PREFIX + ".ban");
+	}
+	
+	
+	@Override
+	public String getUsage() {
+		return tr("subCommandBan usage", getName());
+	}
+
+	@Override
+	public String getDescription() {
+		return tr("subCommandBan description", getName());
 	}
 	
 	@Override
-	public List<String> onTabComplete(int position, List<String> messages) {
+	protected List<String> getTabCompletions(String input, List<String> wholeUserChat, CommandSender tabCompleter) {
+		System.out.println(wholeUserChat + " " + input + " " + wholeUserChat.size());
 		List<String> toReturn = new ArrayList<>();
-		if(position == 0) {
-			toReturn.addAll(getAllProfileNames());
+		if(wholeUserChat.size() == 2) {
+			toReturn.addAll(Util.getAllProfileNames());
 		}
 		return toReturn;
 	}
 	
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(CommandSender sender, String... args) {
 		if(args.length < 3) {
 			return false;
 		}

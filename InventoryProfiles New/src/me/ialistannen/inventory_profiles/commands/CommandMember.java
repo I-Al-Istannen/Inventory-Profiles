@@ -5,41 +5,55 @@ import static me.ialistannen.inventory_profiles.util.Util.tr;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import me.ialistannen.inventory_profiles.InventoryProfiles;
 import me.ialistannen.inventory_profiles.hooks.RegionHook.RegionObject;
 import me.ialistannen.inventory_profiles.hooks.RegionHook.RegionRole;
 import me.ialistannen.inventory_profiles.players.Profile;
+import me.ialistannen.inventory_profiles.util.Util;
+import me.ialistannen.tree_command_system.PlayerCommandNode;
 
 /**
  * Adds a User as a Member of a Region
  */
-public class CommandMember extends CommandPreset {
-
+public class CommandMember extends PlayerCommandNode {
+	
 	/**
-	 * A new instance
+	 * New instance
 	 */
 	public CommandMember() {
-		super("", true);
+		super(tr("subCommandMember name"), tr("subCommandMember keyword"),
+				Pattern.compile(tr("subCommandMember pattern"), Pattern.CASE_INSENSITIVE), "");
+	}
+	
+	
+	@Override
+	public String getUsage() {
+		return tr("subCommandMember usage", getName());
+	}
+
+	@Override
+	public String getDescription() {
+		return tr("subCommandMember description", getName());
 	}
 	
 	@Override
-	public List<String> onTabComplete(int position, List<String> messages) {
+	protected List<String> getTabCompletions(String input, List<String> wholeUserChat, Player player) {
 		List<String> list = new ArrayList<>();
-		if(position == 0) {
-			list.addAll(getAllProfileNames());
+		if(wholeUserChat.size() == 2) {
+			list.addAll(Util.getAllProfileNames());
 		}
-		else if(position == 1) {	// keywords for adding/removing
+		else if(wholeUserChat.size() == 3) {	// keywords for adding/removing
 			list.add(tr("member remove pattern").contains("|") ? tr("member remove pattern").split("\\|")[0] : tr("member remove pattern"));
 			list.add(tr("member add pattern").contains("|") ? tr("member add pattern").split("\\|")[0] : tr("member add pattern"));
 		}
-		else if(position == 2) {	// world
+		else if(wholeUserChat.size() == 4) {	// world
 			list.addAll(Bukkit.getWorlds().stream().map(world -> world.getName()).collect(Collectors.toList()));
 		}
 		
@@ -47,20 +61,19 @@ public class CommandMember extends CommandPreset {
 	}
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(Player player, String... args) {
 		// target, <add|remove>, world, region name
 		if(args.length < 4) {
 			return false;
 		}
 		
-		Player player = (Player) sender;
 		if(!InventoryProfiles.getProfileManager().hasProfile(player.getDisplayName())) {
 			player.sendMessage(tr("not logged in"));
 			return true;
 		}
 		
 		if(!InventoryProfiles.getProfileManager().hasProfile(args[0])) {
-			sender.sendMessage(tr("username unknown", args[0]));
+			player.sendMessage(tr("username unknown", args[0]));
 			return true;
 		}
 		
@@ -71,19 +84,19 @@ public class CommandMember extends CommandPreset {
 		World world = Bukkit.getWorld(args[2]);
 
 		if(world == null) {
-			sender.sendMessage(tr("world not valid", args[2]));
+			player.sendMessage(tr("world not valid", args[2]));
 			return true;
 		}
 		
 		String region = args[3];
 		
 		if(!InventoryProfiles.hasRegionHook()) {
-			sender.sendMessage(tr("no region hook found"));
+			player.sendMessage(tr("no region hook found"));
 			return true;
 		}
 		
 		if(!InventoryProfiles.getRegionHook().hasRegion(region, world)) {
-			sender.sendMessage(tr("region not valid", region));
+			player.sendMessage(tr("region not valid", region));
 			return true;
 		}
 
@@ -94,7 +107,7 @@ public class CommandMember extends CommandPreset {
 		}).findFirst();
 		
 		if(!regionObjOpt.isPresent() || regionObjOpt.get().getRole() != RegionRole.OWNER) {
-			sender.sendMessage(tr("not your region"));
+			player.sendMessage(tr("not your region"));
 			return true;
 		}
 		
@@ -102,7 +115,7 @@ public class CommandMember extends CommandPreset {
 		if(args[1].toLowerCase().matches(tr("member remove pattern").toLowerCase())) {
 			targetProfile.removeRegionObject(new RegionObject(region, world, RegionRole.MEMBER));
 			
-			sender.sendMessage(tr("member successfully removed", targetProfile.getName(), world.getName(), region));
+			player.sendMessage(tr("member successfully removed", targetProfile.getName(), world.getName(), region));
 			return true;
 		}
 		
@@ -110,12 +123,12 @@ public class CommandMember extends CommandPreset {
 		else if(args[1].toLowerCase().matches(tr("member add pattern").toLowerCase())) {
 			targetProfile.addRegionObject(new RegionObject(region, world, RegionRole.MEMBER));
 			
-			sender.sendMessage(tr("member successfully added", targetProfile.getName(), world.getName(), region));
+			player.sendMessage(tr("member successfully added", targetProfile.getName(), world.getName(), region));
 			return true;
 		}
 		
 		else {
-			sender.sendMessage(tr("member pattern not known", args[1]));
+			player.sendMessage(tr("member pattern not known", args[1]));
 			return true;
 		}
 	}

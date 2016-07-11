@@ -4,34 +4,44 @@ import static me.ialistannen.inventory_profiles.util.Util.tr;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import me.ialistannen.inventory_profiles.InventoryProfiles;
+import me.ialistannen.tree_command_system.PlayerCommandNode;
 
 /**
  * Logs a player out
  */
-public class CommandLogout extends CommandPreset {
-
+public class CommandLogout extends PlayerCommandNode {
+	
 	/**
-	 * Constructs an instance.
+	 * New instance
 	 */
 	public CommandLogout() {
-		super("", true);
+		super(tr("subCommandLogout name"), tr("subCommandLogout keyword"),
+				Pattern.compile(tr("subCommandLogout pattern"), Pattern.CASE_INSENSITIVE), "");
+	}
+	
+	
+	@Override
+	public String getUsage() {
+		return tr("subCommandLogout usage", getName());
+	}
+
+	@Override
+	public String getDescription() {
+		return tr("subCommandLogout description", getName());
 	}
 	
 	@Override
-	public List<String> onTabComplete(int position, List<String> messages) {
+	protected List<String> getTabCompletions(String input, List<String> wholeUserChat, Player player) {
 		return Collections.emptyList();
 	}
 	
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		
-		Player player = (Player) sender;
-		
+	public boolean execute(Player player, String... args) {		
 		if(!InventoryProfiles.getProfileManager().hasProfile(player.getDisplayName())) {
 			player.sendMessage(tr("not logged in"));
 			return true;

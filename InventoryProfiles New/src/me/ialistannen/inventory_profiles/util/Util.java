@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -244,5 +245,14 @@ public class Util {
 	 */
 	public static String tr(String key, Object... formattingObjects) {
 		return color(InventoryProfiles.getInstance().getLanguage().tr(key, formattingObjects));
+	}
+	
+	/**
+	 * A list with the names of all profiles
+	 * 
+	 * @return A List with the names of all Profiles
+	 */
+	public static List<String> getAllProfileNames() {
+		return InventoryProfiles.getProfileManager().getAll().stream().map(prof -> prof.getName()).collect(Collectors.toList());
 	}
 }

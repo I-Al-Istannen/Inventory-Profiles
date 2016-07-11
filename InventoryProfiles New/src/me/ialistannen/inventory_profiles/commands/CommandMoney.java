@@ -5,6 +5,7 @@ import static me.ialistannen.inventory_profiles.util.Util.tr;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -12,38 +13,52 @@ import org.bukkit.entity.Player;
 import me.ialistannen.inventory_profiles.InventoryProfiles;
 import me.ialistannen.inventory_profiles.players.Profile;
 import me.ialistannen.inventory_profiles.util.Util;
+import me.ialistannen.tree_command_system.CommandNode;
 
 /**
  * Sets/takes/gives/ shows money
  */
-public class CommandMoney extends CommandPreset {
-
+public class CommandMoney extends CommandNode {
+	
 	/**
-	 * A new instance. Constructor, you know.
+	 * New instance
 	 */
 	public CommandMoney() {
-		super("", false);
+		super(tr("subCommandMoney name"), tr("subCommandMoney keyword"),
+				Pattern.compile(tr("subCommandMoney pattern"), Pattern.CASE_INSENSITIVE), "");
+	}
+	
+	
+	@Override
+	public String getUsage() {
+		return tr("subCommandMoney usage", getName());
+	}
+
+	@Override
+	public String getDescription() {
+		return tr("subCommandMoney description", getName());
 	}
 	
 	@Override
-	public List<String> onTabComplete(int position, List<String> messages) {
+	protected List<String> getTabCompletions(String input, List<String> wholeUserChat, CommandSender tabCompleter) {
 		List<String> toReturn = new ArrayList<>();
 		
 		// highly unstable, Maybe better without?
-		if(position == 0) {
+		if(wholeUserChat.size() == 2) {
 			toReturn.add(tr("subCommandMoneyBalanceKeyword").contains("|") ? tr("subCommandMoneyBalanceKeyword").split("\\|")[0] : tr("subCommandMoneyBalanceKeyword"));
 			toReturn.add(tr("subCommandMoneySetKeyword").contains("|") ? tr("subCommandMoneySetKeyword").split("\\|")[0] : tr("subCommandMoneySetKeyword"));
 			toReturn.add(tr("subCommandMoneyTakeKeyword").contains("|") ? tr("subCommandMoneyTakeKeyword").split("\\|")[0] : tr("subCommandMoneyTakeKeyword"));
 			toReturn.add(tr("subCommandMoneyGiveKeyword").contains("|") ? tr("subCommandMoneyGiveKeyword").split("\\|")[0] : tr("subCommandMoneyGiveKeyword"));
 		}
-		if(position == 1) {
-			toReturn.addAll(getAllProfileNames());
+		if(wholeUserChat.size() == 3) {
+			toReturn.addAll(Util.getAllProfileNames());
 		}
 		return toReturn;
 	}
 	
+	
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(CommandSender sender, String... args) {
 		
 		if(sender instanceof Player) {
 			if(args.length == 0 || !sender.hasPermission(Util.PERMISSION_PREFIX + ".money")) {

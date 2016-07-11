@@ -7,35 +7,50 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.bukkit.command.CommandSender;
 
 import me.ialistannen.inventory_profiles.InventoryProfiles;
 import me.ialistannen.inventory_profiles.players.Profile;
 import me.ialistannen.inventory_profiles.util.Util;
+import me.ialistannen.tree_command_system.CommandNode;
 
 /**
  * Allows the setting of a playtime modifier
  */
-public class CommandSetPlaytimeModifier extends CommandPreset {
-
+public class CommandSetPlaytimeModifier extends CommandNode {
+	
 	/**
-	 * Nothing to see here
+	 * New instance
 	 */
 	public CommandSetPlaytimeModifier() {
-		super(Util.PERMISSION_PREFIX + ".setPlaytimeModifier", false);
+		super(tr("subCommandSetPlaytimeModifier name"), tr("subCommandSetPlaytimeModifier keyword"),
+				Pattern.compile(tr("subCommandSetPlaytimeModifier pattern"), Pattern.CASE_INSENSITIVE),
+				Util.PERMISSION_PREFIX + ".setPlaytimeModifier");
+	}
+	
+	
+	@Override
+	public String getUsage() {
+		return tr("subCommandSetPlaytimeModifier usage", getName());
+	}
+
+	@Override
+	public String getDescription() {
+		return tr("subCommandSetPlaytimeModifier description", getName());
 	}
 	
 	@Override
-	public List<String> onTabComplete(int position, List<String> messages) {
-		if(position == 0) {
-			return getAllProfileNames();
+	protected List<String> getTabCompletions(String input, List<String> wholeUserChat, CommandSender tabCompleter) {
+		if(wholeUserChat.size() == 2) {
+			return Util.getAllProfileNames();
 		}
 		return Collections.emptyList();
 	}
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(CommandSender sender, String... args) {
 		if(args.length < 3) {
 			return false;
 		}

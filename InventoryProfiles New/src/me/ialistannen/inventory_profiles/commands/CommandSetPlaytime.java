@@ -6,37 +6,52 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.bukkit.command.CommandSender;
 
 import me.ialistannen.inventory_profiles.InventoryProfiles;
 import me.ialistannen.inventory_profiles.players.Profile;
 import me.ialistannen.inventory_profiles.util.Util;
+import me.ialistannen.tree_command_system.CommandNode;
 
 /**
  * Sets or shows the playtime for a user
  */
-public class CommandSetPlaytime extends CommandPreset {
-
+public class CommandSetPlaytime extends CommandNode {
+	
 	/**
-	 * ... Javadoc warnings NOT needed in this case.
+	 * New instance
 	 */
 	public CommandSetPlaytime() {
-		super(Util.PERMISSION_PREFIX + ".setPlaytime", false);
+		super(tr("subCommandSetPlaytime name"), tr("subCommandSetPlaytime keyword"),
+				Pattern.compile(tr("subCommandSetPlaytime pattern"), Pattern.CASE_INSENSITIVE),
+				Util.PERMISSION_PREFIX + ".setPlaytime");
+	}
+	
+	
+	@Override
+	public String getUsage() {
+		return tr("subCommandSetPlaytime usage", getName());
+	}
+
+	@Override
+	public String getDescription() {
+		return tr("subCommandSetPlaytime description", getName());
 	}
 	
 	@Override
-	public List<String> onTabComplete(int position, List<String> messages) {
+	protected List<String> getTabCompletions(String input, List<String> wholeUserChat, CommandSender tabCompleter) {
 		List<String> toReturn = new ArrayList<>();
 		
-		if(position == 0) {
-			toReturn.addAll(getAllProfileNames());
+		if(wholeUserChat.size() == 2) {
+			toReturn.addAll(Util.getAllProfileNames());
 		}
 		return toReturn;
 	}
 	
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(CommandSender sender, String... args) {
 		if(args.length < 2) {
 			return false;
 		}

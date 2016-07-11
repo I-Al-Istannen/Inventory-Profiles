@@ -5,44 +5,56 @@ import static me.ialistannen.inventory_profiles.util.Util.tr;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import me.ialistannen.inventory_profiles.InventoryProfiles;
 import me.ialistannen.inventory_profiles.players.Profile;
 import me.ialistannen.inventory_profiles.util.Util;
+import me.ialistannen.tree_command_system.PlayerCommandNode;
 
 /**
  * The Pay command. Pays another use some of your money
  */
-public class CommandPay extends CommandPreset {
+public class CommandPay extends PlayerCommandNode {
 
 	/**
-	 * Three thousand years we slumbered, now we RIIISE
+	 * New instance
 	 */
 	public CommandPay() {
-		super("", true);
+		super(tr("subCommandPay name"), tr("subCommandPay keyword"),
+				Pattern.compile(tr("subCommandPay pattern"), Pattern.CASE_INSENSITIVE), "");
+	}
+	
+	
+	@Override
+	public String getUsage() {
+		return tr("subCommandPay usage", getName());
+	}
+
+	@Override
+	public String getDescription() {
+		return tr("subCommandPay description", getName());
 	}
 	
 	@Override
-	public List<String> onTabComplete(int position, List<String> messages) {
+	protected List<String> getTabCompletions(String input, List<String> wholeUserChat, Player player) {
 		List<String> toReturn = new ArrayList<>();
 		
-		if(position == 0) {
-			toReturn.addAll(getAllProfileNames());
+		if(wholeUserChat.size() == 2) {
+			toReturn.addAll(Util.getAllProfileNames());
 		}
 		return toReturn;
 	}
-
+	
 	
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(Player player, String... args) {
 		if(args.length < 2) {
 			return false;
 		}
 		
-		Player player = (Player) sender;
 		if(!InventoryProfiles.getProfileManager().hasProfile(player.getDisplayName())) {
 			player.sendMessage(tr("not logged in"));
 			return true;
@@ -51,14 +63,14 @@ public class CommandPay extends CommandPreset {
 		Profile profile = InventoryProfiles.getProfileManager().getProfile(player.getDisplayName()).get();
 		
 		if(!InventoryProfiles.getProfileManager().hasProfile(args[0])) {
-			sender.sendMessage(tr("username unknown", args[0]));
+			player.sendMessage(tr("username unknown", args[0]));
 			return true;
 		}
 		
 		Optional<Double> money = Util.getDouble(args[1]);
 		
 		if(!money.isPresent()) {
-			sender.sendMessage(tr("not a double", args[1]));
+			player.sendMessage(tr("not a double", args[1]));
 			return true;
 		}
 		
@@ -67,7 +79,7 @@ public class CommandPay extends CommandPreset {
 		double playerBalance = profile.getMoney(true);
 		
 		if(playerBalance < money.get()) {
-			sender.sendMessage(tr("not enough money", money.get() - playerBalance));
+			player.sendMessage(tr("not enough money", money.get() - playerBalance));
 			return true;
 		}
 		

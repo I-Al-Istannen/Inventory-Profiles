@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.bukkit.command.CommandSender;
@@ -16,32 +17,45 @@ import me.ialistannen.inventory_profiles.InventoryProfiles;
 import me.ialistannen.inventory_profiles.hooks.RegionHook.RegionRole;
 import me.ialistannen.inventory_profiles.players.Profile;
 import me.ialistannen.inventory_profiles.util.Util;
+import me.ialistannen.tree_command_system.CommandNode;
 
 /**
  * Lists all the regions a player owns
  */
-public class CommandListRegions extends CommandPreset {
-
+public class CommandListRegions extends CommandNode {
+	
 	/**
-	 * A new instance
+	 * New instance
 	 */
 	public CommandListRegions() {
-		super("", false);
+		super(tr("subCommandListRegions name"), tr("subCommandListRegions keyword"),
+				Pattern.compile(tr("subCommandListRegions pattern"), Pattern.CASE_INSENSITIVE), "");
+	}
+	
+	
+	@Override
+	public String getUsage() {
+		return tr("subCommandListRegions usage", getName());
+	}
+
+	@Override
+	public String getDescription() {
+		return tr("subCommandListRegions description", getName());
 	}
 	
 	@Override
-	public List<String> onTabComplete(int position, List<String> messages) {
-		if(position == 0) {
+	protected List<String> getTabCompletions(String input, List<String> wholeUserChat, CommandSender tabCompleter) {
+		if(wholeUserChat.size() == 2) {
 			return Arrays.stream(RegionRole.values()).map(role -> role.getTranslatedName()).collect(Collectors.toList());
 		}
-		if(position == 1) {
-			return getAllProfileNames();
+		if(wholeUserChat.size() == 3) {
+			return Util.getAllProfileNames();
 		}
 		return Collections.emptyList();
 	}
-
+	
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(CommandSender sender, String... args) {
 		if(args.length < 1) {
 			return false;
 		}

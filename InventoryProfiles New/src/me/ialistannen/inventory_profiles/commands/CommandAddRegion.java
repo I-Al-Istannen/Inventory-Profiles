@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -16,36 +17,50 @@ import me.ialistannen.inventory_profiles.hooks.RegionHook.RegionObject;
 import me.ialistannen.inventory_profiles.hooks.RegionHook.RegionRole;
 import me.ialistannen.inventory_profiles.players.Profile;
 import me.ialistannen.inventory_profiles.util.Util;
+import me.ialistannen.tree_command_system.CommandNode;
 
 /**
  * Adds a user to a region
  */
-public class CommandAddRegion extends CommandPreset {
+public class CommandAddRegion extends CommandNode {
 
 	/**
 	 * New instance
 	 */
 	public CommandAddRegion() {
-		super(Util.PERMISSION_PREFIX + ".addRegion", false);
+		super(tr("subCommandAddRegion name"), tr("subCommandAddRegion keyword"),
+				Pattern.compile(tr("subCommandAddRegion pattern"), Pattern.CASE_INSENSITIVE),
+				Util.PERMISSION_PREFIX + ".addRegion");
+	}
+	
+	
+	@Override
+	public String getUsage() {
+		return tr("subCommandAddRegion usage", getName());
+	}
+
+	@Override
+	public String getDescription() {
+		return tr("subCommandAddRegion description", getName());
 	}
 	
 	@Override
-	public List<String> onTabComplete(int position, List<String> messages) {
+	protected List<String> getTabCompletions(String input, List<String> wholeUserChat, CommandSender tabCompleter) {
 		List<String> toReturn = new ArrayList<>();
-		if(position == 0) {
-			toReturn.addAll(getAllProfileNames());
+		if(wholeUserChat.size() == 2) {
+			toReturn.addAll(Util.getAllProfileNames());
 		}
-		else if(position == 1) {
+		else if(wholeUserChat.size() == 3) {
 			Bukkit.getWorlds().stream().map(world -> world.getName()).forEach(toReturn::add);
 		}
-		else if(position == 3) {
+		else if(wholeUserChat.size() == 4) {
 			Arrays.stream(RegionRole.values()).map(role -> Util.getNiceNameForConstant(role.name())).forEach(toReturn::add);
 		}
 		return toReturn;
 	}
 	
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(CommandSender sender, String... args) {
 		if(args.length < 4) {
 			return false;
 		}
@@ -88,5 +103,4 @@ public class CommandAddRegion extends CommandPreset {
 		sender.sendMessage(tr("added region", profile.getName(), Util.getNiceNameForConstant(role.name()), region, world.getName()));
 		return true;
 	}
-
 }
