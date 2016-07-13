@@ -6,52 +6,62 @@ import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.trItem;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import me.ialistannen.ip_sign_shop.IPSignShop;
 import me.ialistannen.ip_sign_shop.datastorage.Shop;
 import me.ialistannen.ip_sign_shop.util.IPSignShopUtil;
+import me.ialistannen.tree_command_system.PlayerCommandNode;
 
 /**
  * Find the nearest shop selling the item
  */
-public class CommandFind extends CommandPreset {
+public class CommandFind extends PlayerCommandNode {
 
 	/**
 	 * Constructs an instance
 	 */
 	public CommandFind() {
-		super("", true);
+		super(tr("CommandFind name"), tr("CommandFind keyword"),
+				Pattern.compile(tr("CommandFind keyword"), Pattern.CASE_INSENSITIVE), "");
 	}
-
+	
 	@Override
-	public List<String> getTabCompletionChoices(int index, String[] message) {
+	public String getUsage() {
+		return tr("CommandFind usage", getName(), getKeyword());
+	}
+	
+	@Override
+	public String getDescription() {
+		return tr("CommandFind description", getName(), getKeyword());
+	}
+	
+	@Override
+	protected List<String> getTabCompletions(String input, List<String> wholeUserChat, Player player) {
 		List<String> list = new ArrayList<>();
-		if(index == 0) {
+		if(wholeUserChat.size() == 2) {
 			list.addAll(getMaterialNames());
 		}
 		return list;
 	}
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(Player player, String... args) {
 		if(args.length < 1) {
 			return false;
 		}
-		
-		Player player = (Player) sender;
-		
+				
 		List<String> choices = IPSignShopUtil.getStartingWith(getMaterialNames(), clean(args[0]));
 		
 		Collections.sort(choices);
 		
 		if(choices.isEmpty()) {
-			player.sendMessage(tr(getIndentifier() + " material unknown", args[0]));
+			player.sendMessage(tr("CommandFind material unknown", args[0]));
 			return true;
 		}
 		
@@ -88,13 +98,13 @@ public class CommandFind extends CommandPreset {
 			
 			player.teleport(teleportTo);
 			
-			player.sendMessage(tr(getIndentifier() + " found shop", nearestShop.getOwner(), nearestDistance,
+			player.sendMessage(tr("CommandFind found shop", nearestShop.getOwner(), nearestDistance,
 					nearestShop.getItemName(), nearestShop.getItemAmount(), nearestShop.getPrice()));
 			
 			return true;
 		}
 		
-		player.sendMessage(tr(getIndentifier() + " no shop found", args[0]));
+		player.sendMessage(tr("CommandFind no shop found", args[0]));
 		
 		return true;
 	}

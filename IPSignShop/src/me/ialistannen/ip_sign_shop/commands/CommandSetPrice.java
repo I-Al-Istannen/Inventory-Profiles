@@ -8,43 +8,52 @@ import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import me.ialistannen.ip_sign_shop.IPSignShop;
 import me.ialistannen.ip_sign_shop.datastorage.Shop;
 import me.ialistannen.ip_sign_shop.util.IPSignShopUtil;
+import me.ialistannen.tree_command_system.PlayerCommandNode;
 
 /**
  * Allows you setting the price
  */
-public class CommandSetPrice extends CommandPreset {
+public class CommandSetPrice extends PlayerCommandNode {
 
 	/**
 	 * Constructs an instance
 	 */
 	public CommandSetPrice() {
-		super("", true);
+		super(tr("CommandSetPrice name"), tr("CommandSetPrice keyword"),
+				Pattern.compile(tr("CommandSetPrice keyword"), Pattern.CASE_INSENSITIVE), "");
 	}
-
+	
+	@Override
+	public String getUsage() {
+		return tr("CommandSetPrice usage", getName(), getKeyword());
+	}
+	
+	@Override
+	public String getDescription() {
+		return tr("CommandSetPrice description", getName(), getKeyword());
+	}
 	
 	
 	@Override
-	public List<String> getTabCompletionChoices(int index, String[] message) {
+	protected List<String> getTabCompletions(String input, List<String> wholeUserChat, Player player) {
 		return Collections.emptyList();
 	}
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public boolean execute(Player player, String... args) {
 		
 		if(args.length < 1) {
 			return false;
 		}
-		
-		Player player = (Player) sender;
 		
 		Block targetBlock = player.getTargetBlock((Set<Material>) null, 100);
 		
@@ -65,7 +74,7 @@ public class CommandSetPrice extends CommandPreset {
 		
 		Shop shop = IPSignShop.getShopManager().getShopForLocation(targetBlock.getLocation());
 		
-		if(!shop.getOwner().equals(player.getDisplayName()) && !player.hasPermission(IPSignShopUtil.PERMISSION_PREFIX + ".help")) {
+		if(!shop.getOwner().equals(player.getDisplayName()) && !player.hasPermission(IPSignShopUtil.PERMISSION_PREFIX + ".alterOther")) {
 			player.sendMessage(tr("no permission to alter other players shop", shop.getOwner()));
 			return true;
 		}
@@ -80,7 +89,7 @@ public class CommandSetPrice extends CommandPreset {
 		double oldPrice = shop.getPrice();
 		shop.setPrice(price);
 		
-		player.sendMessage(tr(getIndentifier() + " set shop price", shop.getOwner(), price, oldPrice));
+		player.sendMessage(tr("CommandSetPrice set shop price", shop.getOwner(), price, oldPrice));
 		
 		return true;
 	}

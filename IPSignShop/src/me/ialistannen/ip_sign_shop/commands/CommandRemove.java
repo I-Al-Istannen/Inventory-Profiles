@@ -6,38 +6,47 @@ import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.trItem;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import me.ialistannen.ip_sign_shop.IPSignShop;
 import me.ialistannen.ip_sign_shop.datastorage.Shop;
 import me.ialistannen.ip_sign_shop.util.IPSignShopUtil;
+import me.ialistannen.tree_command_system.PlayerCommandNode;
 
 /**
  * Removes a shop
  */
-public class CommandRemove extends CommandPreset {
-
+public class CommandRemove extends PlayerCommandNode {
+	
 	/**
 	 * Constructs an instance
 	 */
 	public CommandRemove() {
-		super("", true);
+		super(tr("CommandRemove name"), tr("CommandRemove keyword"),
+				Pattern.compile(tr("CommandRemove keyword"), Pattern.CASE_INSENSITIVE), "");
+	}
+	
+	@Override
+	public String getUsage() {
+		return tr("CommandRemove usage", getName(), getKeyword());
+	}
+	
+	@Override
+	public String getDescription() {
+		return tr("CommandRemove description", getName(), getKeyword());
 	}
 
 	@Override
-	public List<String> getTabCompletionChoices(int index, String[] message) {
+	protected List<String> getTabCompletions(String input, List<String> wholeUserChat, Player player) {
 		return Collections.emptyList();
 	}
 
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		
-		Player player = (Player) sender;
-		
+	public boolean execute(Player player, String... args) {		
 		Block targetBlock = player.getTargetBlock((Set<Material>) null, 100);
 		
 		if(targetBlock == null || targetBlock.getType() == Material.AIR) {
@@ -57,14 +66,14 @@ public class CommandRemove extends CommandPreset {
 		
 		Shop shop = IPSignShop.getShopManager().getShopForLocation(targetBlock.getLocation());
 		
-		if(!shop.getOwner().equals(player.getDisplayName()) && !player.hasPermission(IPSignShopUtil.PERMISSION_PREFIX + ".help")) {
+		if(!shop.getOwner().equals(player.getDisplayName()) && !player.hasPermission(IPSignShopUtil.PERMISSION_PREFIX + ".alterOther")) {
 			player.sendMessage(tr("no permission to alter other players shop", shop.getOwner()));
 			return true;
 		}
 		
 		IPSignShop.getShopManager().removeShop(shop.getSignLocation());
 		
-		player.sendMessage(tr(getIndentifier() + " removed shop", shop.getOwner(), shop.getItemAmount(), shop.getItemName()));
+		player.sendMessage(tr("CommandRemove removed shop", shop.getOwner(), shop.getItemAmount(), shop.getItemName()));
 		
 		return true;
 	}
