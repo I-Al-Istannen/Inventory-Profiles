@@ -10,3 +10,18 @@ show item displayname: true
 # The delay between shop updates. They are not needed for the function, they just restore items that went missing and update the sign.
 # I am sure you love maths, so it is in ticks. 1 second = 20 ticks. Good luck!
 delay between shop updates: 3600
+
+# If false no backups will be created
+auto saver activated: true
+
+# The maximum amount of backups to keep
+maximum backup amount: 20
+
+# The time between backups. Format is quite free:
+# "xxS" ==> milliseconds
+# "xxt" ==> ticks
+# "xxs" ==> seconds
+# "xxm" ==> minutes
+# "xxh" ==> hours
+# "xxd" ==> days
+backup period: "5h"

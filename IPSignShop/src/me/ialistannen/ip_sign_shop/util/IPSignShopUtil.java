@@ -7,11 +7,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.TreeMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -254,5 +257,17 @@ public class IPSignShopUtil {
 	 */
 	public static String trItem(Material material) {
 		return color(IPSignShop.getInstance().getLanguage().translate(material.name(), "Items"));
+	}
+	
+	/**
+	 * Searches an <b>online</b> player by his name or display name
+	 * 
+	 * @param name The name or display name of the player
+	 * @return The player if found
+	 */
+	public static Optional<? extends Player> getPlayerByDisplayOrName(String name) {
+		return Bukkit.getOnlinePlayers().stream()
+				.filter(player -> player.getDisplayName().equalsIgnoreCase(name) || player.getName().equalsIgnoreCase(name))
+				.findAny();
 	}
 }
