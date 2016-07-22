@@ -35,3 +35,18 @@ region refund percentage: 0.5
 
 # If true, the logins and logouts from players will be logged in the console 
 log logins and logouts: true
+
+# The maximum amount of backups, until old ones will be deleted
+maximum backup amount: 2
+
+# Whether the auto saver is activated or not
+auto saver activated: true
+
+# The time between backups. Format is quite free:
+# "xxS" ==> milliseconds
+# "xxt" ==> ticks
+# "xxs" ==> seconds
+# "xxm" ==> minutes
+# "xxh" ==> hours
+# "xxd" ==> days
+backup period: "5h"

@@ -41,9 +41,11 @@ import me.ialistannen.inventory_profiles.listener.BuySignListener;
 import me.ialistannen.inventory_profiles.listener.PlayerListener;
 import me.ialistannen.inventory_profiles.players.Profile;
 import me.ialistannen.inventory_profiles.players.ProfileManager;
+import me.ialistannen.inventory_profiles.runnables.AutoSaver;
 import me.ialistannen.inventory_profiles.runnables.PlaytimeChecker;
 import me.ialistannen.inventory_profiles.signs.BuySign;
 import me.ialistannen.inventory_profiles.signs.SignManager;
+import me.ialistannen.inventory_profiles.util.DurationParser;
 import me.ialistannen.inventory_profiles.util.LocationSerializable;
 import me.ialistannen.inventory_profiles.util.Util;
 import me.ialistannen.languageSystem.I18N;
@@ -102,6 +104,10 @@ public class InventoryProfiles extends JavaPlugin {
 		
 		Bukkit.getPluginManager().registerEvents(new PlayerListener(), this);
 		Bukkit.getPluginManager().registerEvents(new BuySignListener(), this);
+		
+		if(getConfig().getBoolean("auto saver activated")) {
+			new AutoSaver().runTaskTimer(this, 0, DurationParser.parseDurationToTicks(getConfig().getString("backup period")));
+		}
 	}
 	
 	private void registerCommands() {

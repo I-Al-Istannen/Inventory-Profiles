@@ -12,6 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import me.ialistannen.inventory_profiles.InventoryProfiles;
+import me.ialistannen.inventory_profiles.util.DurationParser;
 import me.ialistannen.ip_sign_shop.commands.CommandClean;
 import me.ialistannen.ip_sign_shop.commands.CommandFind;
 import me.ialistannen.ip_sign_shop.commands.CommandHelp;
@@ -27,7 +28,6 @@ import me.ialistannen.ip_sign_shop.listener.CreationListener;
 import me.ialistannen.ip_sign_shop.listener.DestroyListener;
 import me.ialistannen.ip_sign_shop.listener.InteractWithShopListener;
 import me.ialistannen.ip_sign_shop.listener.ProtectShopContentsListener;
-import me.ialistannen.ip_sign_shop.util.DurationParser;
 import me.ialistannen.languageSystem.I18N;
 import me.ialistannen.tree_command_system.CommandTreeCommandListener;
 import me.ialistannen.tree_command_system.CommandTreeManager;

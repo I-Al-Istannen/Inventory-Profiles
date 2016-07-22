@@ -1,8 +1,5 @@
-package me.ialistannen.ip_sign_shop.util;
+package me.ialistannen.inventory_profiles.util;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -10,52 +7,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class DurationParser {
 
-	/**
-	 * @param args The args passed to the Program
-	 */
-	public static void main(String[] args) {
-		List<String> suffixList = Arrays.asList("S", "s", "m", "h", "d", "t");
-		for(int i = 0; i < 30; i++) {
-			long number = 0;
-			String expression = "";
-			do {
-				String suffix = suffixList.get(ThreadLocalRandom.current().nextInt(suffixList.size()));
-				long tmpNumber = ThreadLocalRandom.current().nextLong(100);
-				expression += " " + tmpNumber + suffix;
-				number += getSuffixValue(tmpNumber, suffix);
-			} while(ThreadLocalRandom.current().nextInt(10) < 8); 
-			long res = parseDuration(expression);
-			if(res != number) {
-				System.out.println("Actual: '" + number + "' Got: '" + res + "' Expression: '" + expression + "'");
-				return;
-			}
-		}
-	}
-	
-	private static long getSuffixValue(long value, String suffix) {
-		switch(suffix) {
-		case "S": {
-			return value;
-		}
-		case "t": {
-			return value * 50;
-		}
-		case "s": {
-			return (value*1000);
-		}
-		case "m": {
-			return TimeUnit.MINUTES.toMillis(value);
-		}
-		case "h": {
-			return TimeUnit.HOURS.toMillis(value);
-		}
-		case "d": {
-			return TimeUnit.DAYS.toMillis(value);
-		}
-		}
-		return 0;
-	}
-	
 	/**
      * Small recursive parser by I Al Istannen. Bug me about it, I know it is bad!
 	 * 
