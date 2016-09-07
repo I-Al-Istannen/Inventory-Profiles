@@ -1,75 +1,66 @@
 package me.ialistannen.inventory_profiles.commands;
 
-import static me.ialistannen.inventory_profiles.util.Util.tr;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import org.bukkit.command.CommandSender;
-
+import me.ialistannen.bukkitutil.commandsystem.base.CommandResultType;
+import me.ialistannen.bukkitutil.commandsystem.implementation.DefaultCommand;
 import me.ialistannen.inventory_profiles.InventoryProfiles;
 import me.ialistannen.inventory_profiles.players.Profile;
 import me.ialistannen.inventory_profiles.util.Util;
-import me.ialistannen.tree_command_system.CommandNode;
+import org.bukkit.command.CommandSender;
+
+import java.util.Collections;
+import java.util.List;
+
+import static me.ialistannen.inventory_profiles.util.Util.getAllProfileNames;
+import static me.ialistannen.inventory_profiles.util.Util.tr;
 
 /**
  * Unbans a player
  */
-public class CommandUnban extends CommandNode {
-	
+class CommandUnban extends DefaultCommand {
+
 	/**
 	 * New instance
 	 */
-	public CommandUnban() {
-		super(tr("subCommandUnban name"), tr("subCommandUnban keyword"),
-				Pattern.compile(tr("subCommandUnban pattern"), Pattern.CASE_INSENSITIVE),
-				Util.PERMISSION_PREFIX + ".unban");
-	}
-	
-	
-	@Override
-	public String getUsage() {
-		return tr("subCommandUnban usage", getName());
+	CommandUnban() {
+		super(InventoryProfiles.getInstance().getLanguage(), "command_unban",
+				Util.tr("command_unban_permission"), sender -> true);
 	}
 
 	@Override
-	public String getDescription() {
-		return tr("subCommandUnban description", getName());
-	}
-	
-	@Override
-	protected List<String> getTabCompletions(String input, List<String> wholeUserChat, CommandSender tabCompleter) {
-		List<String> toReturn = new ArrayList<>();
-		
-		if(wholeUserChat.size() == 2) {
-			toReturn.addAll(Util.getAllProfileNames());
+	public List<String> tabComplete(CommandSender sender, String alias, List<String> wholeUserChat,
+	                                int indexRelativeToYou) {
+
+		if (indexRelativeToYou == 0) {
+			return getAllProfileNames();
 		}
-		return toReturn;
+
+		return Collections.emptyList();
 	}
-	
+
+
 	@Override
-	public boolean execute(CommandSender sender, String... args) {
-		if(args.length < 1) {
-			return false;
+	public CommandResultType execute(CommandSender sender, String... args) {
+		if (args.length < 1) {
+			return CommandResultType.SEND_USAGE;
 		}
-		
-		if(!InventoryProfiles.getProfileManager().hasProfile(args[0])) {
+
+		if (!InventoryProfiles.getProfileManager().hasProfile(args[0])) {
 			sender.sendMessage(tr("username unknown", args[0]));
-			return true;
+			return CommandResultType.SUCCESSFUL;
 		}
-		
-		Profile profile = InventoryProfiles.getProfileManager().getProfile(args[0]).get();
-		
-		if(!profile.isBanned()) {
+
+		@SuppressWarnings("OptionalGetWithoutIsPresent") // see hasProfile check above
+				Profile profile = InventoryProfiles.getProfileManager().getProfile(args[0]).get();
+
+		if (!profile.isBanned()) {
 			sender.sendMessage(tr("player not banned"));
-			return true;
+			return CommandResultType.SUCCESSFUL;
 		}
-		
+
 		profile.unban();
-		
+
 		sender.sendMessage(tr("unbanned player", profile.getName()));
-		return true;
+		return CommandResultType.SUCCESSFUL;
 	}
 
 }

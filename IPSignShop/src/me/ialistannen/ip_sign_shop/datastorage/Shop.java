@@ -1,11 +1,8 @@
 package me.ialistannen.ip_sign_shop.datastorage;
 
-import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
-import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.trItem;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import me.ialistannen.inventory_profiles.util.LocationSerializable;
+import me.ialistannen.ip_sign_shop.IPSignShop;
+import me.ialistannen.ip_sign_shop.util.IPSignShopUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
@@ -17,9 +14,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import me.ialistannen.inventory_profiles.util.LocationSerializable;
-import me.ialistannen.ip_sign_shop.IPSignShop;
-import me.ialistannen.ip_sign_shop.util.IPSignShopUtil;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.trItem;
 
 /**
  * Represents a single shop
@@ -27,8 +26,9 @@ import me.ialistannen.ip_sign_shop.util.IPSignShopUtil;
 public class Shop implements ConfigurationSerializable {
 	
 	private String owner;
-	private ItemStack item;
-	private Location signLocation, chestLocation;
+	private final ItemStack item;
+	private final Location signLocation;
+	private final Location chestLocation;
 	private ShopMode mode;
 	private double price;
 	private Item displayItem;
@@ -250,8 +250,8 @@ public class Shop implements ConfigurationSerializable {
 	/**
 	 * @return True if this shop has at least one item left
 	 */
-	public boolean hasItemsLeft() {
-		return getItemAmount() != 0;
+	public boolean hasNoItemsLeft() {
+		return getItemAmount() == 0;
 	}
 	
 	/**
@@ -259,7 +259,7 @@ public class Shop implements ConfigurationSerializable {
 	 * @return True if an item was removed
 	 */
 	public boolean removeItems(int amount) {
-		if(!hasItemsLeft()) {
+		if(hasNoItemsLeft()) {
 			return false;
 		}
 		

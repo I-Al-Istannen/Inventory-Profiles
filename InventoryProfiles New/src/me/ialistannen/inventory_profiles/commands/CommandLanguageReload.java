@@ -1,66 +1,53 @@
 package me.ialistannen.inventory_profiles.commands;
 
-import static me.ialistannen.inventory_profiles.util.Util.tr;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.regex.Pattern;
-
-import org.bukkit.command.CommandSender;
-
+import me.ialistannen.bukkitutil.commandsystem.base.CommandResultType;
+import me.ialistannen.bukkitutil.commandsystem.implementation.DefaultCommand;
 import me.ialistannen.inventory_profiles.InventoryProfiles;
+import me.ialistannen.inventory_profiles.hooks.LanguageEventReceiverHook.ChangeType;
 import me.ialistannen.inventory_profiles.util.Util;
 import me.ialistannen.languageSystem.I18N;
 import me.ialistannen.languageSystem.MessageProvider;
-import me.ialistannen.tree_command_system.CommandNode;
+import org.bukkit.command.CommandSender;
+
+import java.util.Collections;
+import java.util.List;
+
+import static me.ialistannen.inventory_profiles.util.Util.tr;
 
 /**
  * Reloads the Language files
  */
-public class CommandLanguageReload extends CommandNode {
-	
+class CommandLanguageReload extends DefaultCommand {
+
 	/**
 	 * New instance
 	 */
-	public CommandLanguageReload() {
-		super(tr("subCommandLanguageReload name"), tr("subCommandLanguageReload keyword"),
-				Pattern.compile(tr("subCommandLanguageReload pattern"), Pattern.CASE_INSENSITIVE),
-				Util.PERMISSION_PREFIX + ".languageReload");
-	}
-	
-	
-	@Override
-	public String getUsage() {
-		return tr("subCommandLanguageReload usage", getName());
+	CommandLanguageReload() {
+		super(InventoryProfiles.getInstance().getLanguage(), "command_language_reload",
+				Util.tr("command_language_reload_permission"), sender -> true);
 	}
 
 	@Override
-	public String getDescription() {
-		return tr("subCommandLanguageReload description", getName());
-	}
-	
-	@Override
-	protected List<String> getTabCompletions(String input, List<String> wholeUserChat, CommandSender tabCompleter) {
+	public List<String> tabComplete(CommandSender sender, String alias, List<String> wholeUserChat,
+	                                int indexRelativeToYou) {
 		return Collections.emptyList();
 	}
-	
+
 	@Override
-	public boolean execute(CommandSender sender, String... args) {
-		Locale old = InventoryProfiles.getInstance().getCurrentLocale();
-		
+	public CommandResultType execute(CommandSender sender, String... args) {
 		MessageProvider provider = InventoryProfiles.getInstance().getLanguage();
-		if(provider instanceof I18N) {
+		if (provider instanceof I18N) {
 			((I18N) provider).reload();
 		}
-		
-		// reload the commands to reinitialize the keywords (if needed)
-		if(!old.equals(InventoryProfiles.getInstance().getCurrentLocale())) {
-			InventoryProfiles.getInstance().reloadCommands();
-		}
-		
+
+		InventoryProfiles.getInstance().reloadCommands();
+		InventoryProfiles.getInstance().getHookManager()
+				.callLanguageChangeEvent(
+						ChangeType.RELOADED, InventoryProfiles.getInstance().getCurrentLocale()
+				);
+
 		sender.sendMessage(tr("reloaded language files"));
-		return true;
+		return CommandResultType.SUCCESSFUL;
 	}
 
 }

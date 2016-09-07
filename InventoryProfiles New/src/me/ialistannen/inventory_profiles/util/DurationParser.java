@@ -41,7 +41,7 @@ public class DurationParser {
 	 * @return The time in milliseconds
 	 * @throws RuntimeException If an error occurred while parsing.
 	 */
-	public static long parseDuration(String input) throws RuntimeException {
+	private static long parseDuration(String input) throws RuntimeException {
 		return new Object() {
 
 			private int pos = -1, ch;

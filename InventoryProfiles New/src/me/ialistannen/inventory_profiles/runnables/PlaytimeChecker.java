@@ -1,6 +1,10 @@
 package me.ialistannen.inventory_profiles.runnables;
 
-import static me.ialistannen.inventory_profiles.util.Util.tr;
+import me.ialistannen.inventory_profiles.InventoryProfiles;
+import me.ialistannen.inventory_profiles.players.Profile;
+import me.ialistannen.inventory_profiles.util.Util;
+import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -12,19 +16,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitRunnable;
-
-import me.ialistannen.inventory_profiles.InventoryProfiles;
-import me.ialistannen.inventory_profiles.players.Profile;
-import me.ialistannen.inventory_profiles.util.Util;
+import static me.ialistannen.inventory_profiles.util.Util.tr;
 
 /**
  * Checks the playtime
  */
 public class PlaytimeChecker extends BukkitRunnable {
 
-	private Map<String, LocalTime> lastCheckedMap = new HashMap<>();
+	private final Map<String, LocalTime> lastCheckedMap = new HashMap<>();
 	
 	@Override
 	public void run() {
@@ -32,7 +31,7 @@ public class PlaytimeChecker extends BukkitRunnable {
 				.map(Util::parseDurationString)
 				.filter(Optional::isPresent)
 				.map(Optional::get)
-				.map(duration -> duration.getSeconds())
+				.map(Duration::getSeconds)
 				.collect(Collectors.toList());
 		
 		List<Profile> players = Bukkit.getOnlinePlayers().stream()
@@ -53,7 +52,7 @@ public class PlaytimeChecker extends BukkitRunnable {
 				sendWarnMessage(profile);
 			}
 						
-			if(!profile.hasPlaytimeLeft()) {
+			if(profile.hasNoPlaytimeLeft()) {
 				profile.setPlaytimeWentOut(LocalDateTime.now());
 			}
 			InventoryProfiles.getProfileManager().checkAndKickPlayerPlaytime(profile);

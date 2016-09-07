@@ -1,17 +1,17 @@
 package me.ialistannen.ip_sign_shop.conversations;
 
-import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
-
 import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.Prompt;
 import org.bukkit.conversations.StringPrompt;
+
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
 
 /**
  * Asks the user if he really wants to do something.
  */
 public class ConfirmationConversation extends StringPrompt {
 
-	private String promptText;
+	private final String promptText;
 	
 	/**
 	 * @param promptText The - already colored - prompt text.

@@ -1,5 +1,8 @@
 package me.ialistannen.inventory_profiles.signs;
 
+import org.bukkit.Location;
+import org.bukkit.configuration.file.YamlConfiguration;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,17 +13,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.bukkit.Location;
-import org.bukkit.configuration.file.YamlConfiguration;
-
 /**
  * Manages the {@link BuySign}s
  */
 public class SignManager {
 
-	private Map<Location, BuySign> signMap = new HashMap<>();
+	private final Map<Location, BuySign> signMap = new HashMap<>();
 
-	private Path saveFile;
+	private final Path saveFile;
 
 	/**
 	 * @param saveFile

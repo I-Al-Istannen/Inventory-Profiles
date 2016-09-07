@@ -1,6 +1,14 @@
 package me.ialistannen.inventory_profiles.players;
 
-import static me.ialistannen.inventory_profiles.util.Util.tr;
+import me.ialistannen.inventory_profiles.InventoryProfiles;
+import me.ialistannen.inventory_profiles.conversations.ConversationManager.ConversationType;
+import me.ialistannen.inventory_profiles.listener.PlayerListener;
+import me.ialistannen.inventory_profiles.util.Util;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,24 +22,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
-import me.ialistannen.inventory_profiles.InventoryProfiles;
-import me.ialistannen.inventory_profiles.conversations.ConversationManager.ConversationType;
-import me.ialistannen.inventory_profiles.listener.PlayerListener;
-import me.ialistannen.inventory_profiles.util.Util;
+import static me.ialistannen.inventory_profiles.util.Util.tr;
 
 /**
  * manages the profiles
  */
 public class ProfileManager {
 
-	private Map<String, Profile> profileMap = new HashMap<>();
-	private Path saveFile;
+	private final Map<String, Profile> profileMap = new HashMap<>();
+	private final Path saveFile;
 
 	/**
 	 * @param saveFile
@@ -72,7 +71,7 @@ public class ProfileManager {
 
 	/**
 	 * Optional or not, that is the question
-	 * 
+	 *
 	 * @param name
 	 *            The name of the profile
 	 * @return The profile or an empty optional if none found
@@ -83,7 +82,7 @@ public class ProfileManager {
 
 	/**
 	 * Returns all the profiles
-	 * 
+	 *
 	 * @return An unmodifiable collection with all profile
 	 */
 	public Collection<Profile> getAll() {
@@ -98,9 +97,7 @@ public class ProfileManager {
 		PlayerListener.setFrozen(player, true);
 
 		// teleport to world spawn
-		Bukkit.getScheduler().runTask(InventoryProfiles.getInstance(), () -> {
-			player.teleport(player.getWorld().getSpawnLocation());
-		});
+		Bukkit.getScheduler().runTask(InventoryProfiles.getInstance(), () -> player.teleport(player.getWorld().getSpawnLocation()));
 
 		if (InventoryProfiles.hasRegionHook()) {
 			InventoryProfiles.getRegionHook().removeUserFromAllRegions(player);
@@ -124,12 +121,12 @@ public class ProfileManager {
 	/**
 	 * Kicks the player if the playtime has run out. Doesn't set
 	 * {@link Profile#setPlaytimeWentOut(LocalDateTime)}
-	 * 
+	 *
 	 * @param profile
 	 *            The profile
 	 */
 	public void checkAndKickPlayerPlaytime(Profile profile) {
-		if (!profile.hasPlaytimeLeft()) {
+		if (profile.hasNoPlaytimeLeft()) {
 			LocalDateTime playtimeOut = profile.getPlaytimeWentOut().orElse(LocalDateTime.now());
 			Duration resetTime = Util.getPlaytimeResetDelay().orElseGet(() -> {
 				InventoryProfiles.getInstance().getLogger().log(Level.WARNING, "The playtime reset delay is invalid: "
@@ -138,16 +135,21 @@ public class ProfileManager {
 				return Duration.ofHours(-1);
 			});
 
-			profile.getPlayer().ifPresent(player -> {
-				player.kickPlayer(tr("no playtime left",
-						Util.formatDuration(Duration.between(LocalDateTime.now(), playtimeOut.plus(resetTime)))));
-			});
+			profile.getPlayer().ifPresent(player ->
+					player.kickPlayer(
+							tr("no playtime left",
+									Util.formatDuration(
+											Duration.between(LocalDateTime.now(), playtimeOut.plus(resetTime))
+									)
+							)
+					)
+			);
 		}
 	}
 
 	/**
 	 * Checks if the player is banned and kicks him if he is
-	 * 
+	 *
 	 * @param profile
 	 *            The profile to check
 	 */
@@ -155,9 +157,9 @@ public class ProfileManager {
 		if (profile.isBanned()) {
 			Duration banTime = Duration.between(LocalDateTime.now(), profile.getBannedUntil());
 
-			profile.getPlayer().ifPresent(player -> {
-				player.kickPlayer(tr("banned message", Util.formatDuration(banTime), profile.getBanReason()));
-			});
+			profile.getPlayer().ifPresent(player -> player.kickPlayer(
+					tr("banned message", Util.formatDuration(banTime), profile.getBanReason()))
+			);
 		}
 	}
 
@@ -178,10 +180,12 @@ public class ProfileManager {
 
 		if (InventoryProfiles.getInstance().getConfig().getBoolean("log logins and logouts")) {
 			Optional<Profile> profile = InventoryProfiles.getProfileManager().getProfile(player.getDisplayName());
-			profile.ifPresent(prof -> {
-				InventoryProfiles.getInstance().getLogger()
-						.info(tr("player logged out console message", prof.getName(), prof.isBanned(), prof.isOp()));
-			});
+			profile.ifPresent(prof ->
+					InventoryProfiles.getInstance().getLogger()
+							.info(tr("player logged out console message",
+									prof.getName(), prof.isBanned(), prof.isOp())
+							)
+			);
 		}
 
 		player.setDisplayName(player.getName());
@@ -200,7 +204,7 @@ public class ProfileManager {
 
 	/**
 	 * Saves the ProfileManager to the the savefile specified upon creation
-	 * 
+	 *
 	 * @return True if the file was saved, false otherwise
 	 */
 	public boolean save() {
@@ -209,10 +213,10 @@ public class ProfileManager {
 
 	/**
 	 * Saves the ProfileManager to the the savefile specified upon creation
-	 * 
+	 *
 	 * @param path
 	 *            The path to save to
-	 * 
+	 *
 	 * @return True if the file was saved, false otherwise
 	 */
 	public boolean save(Path path) {

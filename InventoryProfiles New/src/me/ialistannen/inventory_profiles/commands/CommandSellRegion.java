@@ -1,102 +1,95 @@
 package me.ialistannen.inventory_profiles.commands;
 
-import static me.ialistannen.inventory_profiles.util.Util.tr;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
-
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
-
+import me.ialistannen.bukkitutil.commandsystem.base.CommandResultType;
+import me.ialistannen.bukkitutil.commandsystem.implementation.DefaultCommand;
 import me.ialistannen.inventory_profiles.InventoryProfiles;
 import me.ialistannen.inventory_profiles.conversations.ConversationManager.ConversationType;
 import me.ialistannen.inventory_profiles.hooks.RegionHook.RegionObject;
 import me.ialistannen.inventory_profiles.hooks.RegionHook.RegionRole;
 import me.ialistannen.inventory_profiles.players.Profile;
 import me.ialistannen.inventory_profiles.signs.BuySign;
-import me.ialistannen.tree_command_system.PlayerCommandNode;
+import me.ialistannen.inventory_profiles.util.Util;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.block.BlockFace;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static me.ialistannen.inventory_profiles.util.Util.tr;
 
 /**
  * Allows the user to sell a region they have
  */
-public class CommandSellRegion extends PlayerCommandNode {
+class CommandSellRegion extends DefaultCommand {
 
 	/**
 	 * New instance
 	 */
-	public CommandSellRegion() {
-		super(tr("subCommandSellRegion name"), tr("subCommandSellRegion keyword"),
-				Pattern.compile(tr("subCommandSellRegion pattern"), Pattern.CASE_INSENSITIVE), "");
-	}
-	
-	
-	@Override
-	public String getUsage() {
-		return tr("subCommandSellRegion usage", getName());
+	CommandSellRegion() {
+		super(InventoryProfiles.getInstance().getLanguage(), "command_sell_region",
+				Util.tr("command_sell_region_permission"), sender -> sender instanceof Player);
 	}
 
 	@Override
-	public String getDescription() {
-		return tr("subCommandSellRegion description", getName());
-	}
-	
-	@Override
-	protected List<String> getTabCompletions(String input, List<String> wholeUserChat, Player player) {
-		List<String> toReturn = new ArrayList<>();
-		
-		if(wholeUserChat.size() == 2) {
-			Bukkit.getWorlds().stream().map(world -> world.getName()).forEach(toReturn::add);
+	public List<String> tabComplete(CommandSender sender, String alias, List<String> wholeUserChat,
+	                                int indexRelativeToYou) {
+
+		if (indexRelativeToYou == 1) {
+			Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
 		}
-		return toReturn;
+		return Collections.emptyList();
 	}
-	
+
+
 	@Override
-	public boolean execute(Player player, String... args) {
-		if(args.length < 2) {
-			return false;
+	public CommandResultType execute(CommandSender sender, String... args) {
+		Player player = (Player) sender;
+		if (args.length < 2) {
+			return CommandResultType.SEND_USAGE;
 		}
-				
-		if(!InventoryProfiles.getProfileManager().hasProfile(player.getDisplayName())) {
+
+		if (!InventoryProfiles.getProfileManager().hasProfile(player.getDisplayName())) {
 			player.sendMessage(tr("not logged in"));
-			return true;
+			return CommandResultType.SUCCESSFUL;
 		}
-		
+
 		Profile profile = InventoryProfiles.getProfileManager().getProfile(player.getDisplayName()).get();
-		
+
 		World world = Bukkit.getWorld(args[0]);
 
-		if(world == null) {
+		if (world == null) {
 			player.sendMessage(tr("world not valid", args[0]));
-			return true;
+			return CommandResultType.SUCCESSFUL;
 		}
-		
+
 		String region = args[1];
-		
-		if(!InventoryProfiles.hasRegionHook()) {
+
+		if (!InventoryProfiles.hasRegionHook()) {
 			player.sendMessage(tr("no region hook found"));
-			return true;
+			return CommandResultType.SUCCESSFUL;
 		}
-		
-		if(!InventoryProfiles.getRegionHook().hasRegion(region, world)) {
+
+		if (InventoryProfiles.getRegionHook().hasNoRegion(region, world)) {
 			player.sendMessage(tr("region not valid", region));
-			return true;
+			return CommandResultType.SUCCESSFUL;
 		}
-		
-		Optional<RegionObject> regionObjOpt = profile.getRegionObjects().stream().filter(regionObject -> {
-			return regionObject.getWorld().getUID().equals(world.getUID())
-					&& regionObject.getRegionID().equalsIgnoreCase(region);
-		}).findFirst();
-		
-		if(!regionObjOpt.isPresent() || regionObjOpt.get().getRole() != RegionRole.OWNER) {
+
+		Optional<RegionObject> regionObjOpt = profile.getRegionObjects().stream().filter(regionObject ->
+				regionObject.getWorld().getUID().equals(world.getUID())
+						&& regionObject.getRegionID().equalsIgnoreCase(region)
+		).findFirst();
+
+		if (!regionObjOpt.isPresent() || regionObjOpt.get().getRole() != RegionRole.OWNER) {
 			player.sendMessage(tr("not your region"));
-			return true;
+			return CommandResultType.SUCCESSFUL;
 		}
-		
-		
+
+
 		RegionObject regionObject = regionObjOpt.get();
 		double refundMoney = regionObject.getPrice()
 				* InventoryProfiles.getInstance().getConfig().getDouble("region refund percentage");
@@ -120,12 +113,13 @@ public class CommandSellRegion extends PlayerCommandNode {
 					}
 
 					BuySign sign = new BuySign(regionObject.getSignLocation().get(), regionObject.getRegionID(),
-							regionObject.getPrice(), regionObject.isWallSign(), regionObject.getSignFacingDirection().orElse(BlockFace.SOUTH));
+							regionObject.getPrice(), regionObject.isWallSign(), regionObject.getSignFacingDirection()
+							.orElse(BlockFace.SOUTH));
 
 					InventoryProfiles.getSignManager().addSign(sign);
 				}, tr("sell region confirmation prompt text", regionObject.getRegionID(), refundMoney));
 
-		return true;
+		return CommandResultType.SUCCESSFUL;
 	}
 
 }

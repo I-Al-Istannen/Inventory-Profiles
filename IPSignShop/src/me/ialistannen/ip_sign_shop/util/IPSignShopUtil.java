@@ -1,15 +1,6 @@
 package me.ialistannen.ip_sign_shop.util;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.TreeMap;
-
+import me.ialistannen.ip_sign_shop.IPSignShop;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -19,7 +10,16 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import me.ialistannen.ip_sign_shop.IPSignShop;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 /**
  * Some util methods
@@ -100,7 +100,7 @@ public class IPSignShopUtil {
 	 * @param delimeter The delimeter between them
 	 * @return The resulting String
 	 */
-	public static String repeat(String toRepeat, int amount, String delimeter) {
+	private static String repeat(String toRepeat, int amount, String delimeter) {
 		StringBuilder builder = new StringBuilder();
 		for(int i = 0; i < amount; i++) {
 			if(i > 0) {
@@ -126,7 +126,7 @@ public class IPSignShopUtil {
 	 * @param input The text to color
 	 * @return The colored text
 	 */
-	public static String color(String input) {
+	private static String color(String input) {
 		return ChatColor.translateAlternateColorCodes('&', input);
 	}
 	
@@ -227,14 +227,10 @@ public class IPSignShopUtil {
 			return new ArrayList<>(choices);
 		}
 		
-		List<String> list = new ArrayList<>();
-		
-		for (String string : choices) {
-			if(string.toLowerCase().startsWith(prefix.toLowerCase())) {
-				list.add(string);
-			}
-		}
-		
+		List<String> list = choices.stream()
+				.filter(string -> string.toLowerCase().startsWith(prefix.toLowerCase()))
+				.collect(Collectors.toList());
+
 		return list;
 	}
 	

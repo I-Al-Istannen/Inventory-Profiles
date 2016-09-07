@@ -1,6 +1,18 @@
 package me.ialistannen.inventory_profiles.players;
 
-import static me.ialistannen.inventory_profiles.util.Util.tr;
+import me.ialistannen.inventory_profiles.InventoryProfiles;
+import me.ialistannen.inventory_profiles.hooks.RegionHook.RegionObject;
+import me.ialistannen.inventory_profiles.util.ExpUtil;
+import me.ialistannen.inventory_profiles.util.LocationSerializable;
+import me.ialistannen.inventory_profiles.util.Util;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -17,20 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
-
-import me.ialistannen.inventory_profiles.InventoryProfiles;
-import me.ialistannen.inventory_profiles.hooks.RegionHook.RegionObject;
-import me.ialistannen.inventory_profiles.util.ExpUtil;
-import me.ialistannen.inventory_profiles.util.LocationSerializable;
-import me.ialistannen.inventory_profiles.util.Util;
+import static me.ialistannen.inventory_profiles.util.Util.tr;
 
 /**
  * Holds information about a player
@@ -45,7 +44,7 @@ public class Profile implements ConfigurationSerializable {
 	private long playtimeModifier;
 	private LocalDate playtimeModifierRunsOut;
 	private LocalDateTime playtimeWentOut;
-	private boolean op;
+	private final boolean op;
 	private double money;
 	private Location lastLogoutLocation;
 	private List<ItemStack> items;
@@ -124,7 +123,7 @@ public class Profile implements ConfigurationSerializable {
 	 * @param world The world the player should spawn in
 	 */
 	public Profile(String name, String password, boolean op, World world) {
-		this(name, password, "", LocalDateTime.now(), op, 0, world.getSpawnLocation(), new ArrayList<ItemStack>(), 0,
+		this(name, password, "", LocalDateTime.now(), op, 0, world.getSpawnLocation(), new ArrayList<>(), 0,
 				new HashSet<>(), GameMode.SURVIVAL, 0, LocalDate.now(), null);
 	}
 
@@ -169,7 +168,7 @@ public class Profile implements ConfigurationSerializable {
 				
 				player.setGameMode(getGameMode());
 				
-				if(!hasPlaytimeLeft() && Util.getPlaytimeResetDelay().isPresent()) {
+				if(hasNoPlaytimeLeft() && Util.getPlaytimeResetDelay().isPresent()) {
 					if(ChronoUnit.SECONDS.between(getPlaytimeWentOut().get(), LocalDateTime.now()) >= Util.getPlaytimeResetDelay().get().getSeconds()) {
 						setUsedPlaytime(0);
 						setPlaytimeWentOut(null);
@@ -202,12 +201,8 @@ public class Profile implements ConfigurationSerializable {
 	 * 
 	 * @return True if the player has playtime left.
 	 */
-	public boolean hasPlaytimeLeft() {
-		if(isOp()) {
-			return true;
-		}
-				
-		return !getPlaytimeLeft().isNegative();
+	public boolean hasNoPlaytimeLeft() {
+		return !isOp() && getPlaytimeLeft().isNegative();
 	}
 	
 	/**
@@ -261,9 +256,7 @@ public class Profile implements ConfigurationSerializable {
 	 */
 	public void setAvaillablePlaytime(Duration time) {
 		Optional<Duration> maxPlayTime = getMaxPlaytime();
-		maxPlayTime.ifPresent(maxTime -> {
-			setUsedPlaytime(maxPlayTime.get().toMillis() - time.toMillis());
-		});
+		maxPlayTime.ifPresent(maxTime -> setUsedPlaytime(maxPlayTime.get().toMillis() - time.toMillis()));
 	}
 	
 	/**
@@ -331,7 +324,7 @@ public class Profile implements ConfigurationSerializable {
 	/**
 	 * @param banReason the ban reason
 	 */
-	public void setBanReason(String banReason) {
+	private void setBanReason(String banReason) {
 		this.banReason = banReason;
 	}
 	/**
@@ -343,7 +336,7 @@ public class Profile implements ConfigurationSerializable {
 	/**
 	 * @param bannedUntil Until when he is banned
 	 */
-	public void setBannedUntil(LocalDateTime bannedUntil) {
+	private void setBannedUntil(LocalDateTime bannedUntil) {
 		this.bannedUntil = bannedUntil;
 	}
 	/**
@@ -398,7 +391,7 @@ public class Profile implements ConfigurationSerializable {
 	/**
 	 * @return the Location the player was at when he logged out
 	 */
-	public Location getLastLogoutLocation() {
+	private Location getLastLogoutLocation() {
 		return lastLogoutLocation.clone();
 	}
 	/**
@@ -410,7 +403,7 @@ public class Profile implements ConfigurationSerializable {
 	/**
 	 * @return the items of the player
 	 */
-	public List<ItemStack> getItems() {
+	private List<ItemStack> getItems() {
 		return items;
 	}
 	/**
@@ -435,7 +428,7 @@ public class Profile implements ConfigurationSerializable {
 	/**
 	 * @return the xp the player has
 	 */
-	public int getXp() {
+	private int getXp() {
 		return xp;
 	}
 	/**
@@ -459,7 +452,7 @@ public class Profile implements ConfigurationSerializable {
 	/**
 	 * @return The {@link GameMode} of the player
 	 */
-	public GameMode getGameMode() {
+	private GameMode getGameMode() {
 		return gameMode;
 	}
 	/**
@@ -469,31 +462,32 @@ public class Profile implements ConfigurationSerializable {
 		this.gameMode = gameMode;
 	}
 	/**
-	 * @return The playtimemodifier in Milliseconds
+	 * @return The playtime modifier in Milliseconds
 	 */
 	public long getPlaytimeModifier() {
 		return playtimeModifier;
 	}
 	/**
-	 * You should also set the {@link #setPlaytimeModifierRunsOut(LocalDate)} or use the convenient method {@link #setPlaytimeModifierRunsOut(LocalDate)}
+	 * You should also set the {@link #setPlaytimeModifierRunsOut(LocalDate)}
+	 * or use the convenient method {@link #setPlaytimeModifierRunsOut(LocalDate)}
 	 * 
 	 * @param playtimeModifier The Playtime modifier in Milliseconds
 	 */
-	public void setPlaytimeModifier(long playtimeModifier) {
+	private void setPlaytimeModifier(long playtimeModifier) {
 		this.playtimeModifier = playtimeModifier;
 	}
 	/**
 	 * @return The date the playtime modifier was given
 	 */
-	public LocalDate getPlaytimeModifierRunsOut() {
+	private LocalDate getPlaytimeModifierRunsOut() {
 		return playtimeModifierRunsOut;
 	}
 	/**
-	 * You should also set the {@link #setPlaytimeModifier(long)} or use the convenient method {@link #setPlaytimeModifierRunsOut(LocalDate)}
+	 * You should also set the {@link #setPlaytimeModifier(long)}
 	 * 
-	 * @param playtimeModifierRunsOut The time the Playtime modifer runs out
+	 * @param playtimeModifierRunsOut The time the Playtime modifier runs out
 	 */
-	public void setPlaytimeModifierRunsOut(LocalDate playtimeModifierRunsOut) {
+	private void setPlaytimeModifierRunsOut(LocalDate playtimeModifierRunsOut) {
 		this.playtimeModifierRunsOut = playtimeModifierRunsOut;
 	}
 	/**

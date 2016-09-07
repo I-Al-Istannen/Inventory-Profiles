@@ -1,25 +1,24 @@
 package me.ialistannen.inventory_profiles.conversations;
 
-import static me.ialistannen.inventory_profiles.util.Util.tr;
-
+import me.ialistannen.inventory_profiles.InventoryProfiles;
+import me.ialistannen.inventory_profiles.players.Profile;
 import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.Prompt;
 import org.bukkit.conversations.StringPrompt;
 
-import me.ialistannen.inventory_profiles.InventoryProfiles;
-import me.ialistannen.inventory_profiles.players.Profile;
+import static me.ialistannen.inventory_profiles.util.Util.tr;
 
 /**
  * The login conversation. Sets the profile as Session data with the key "profile".
  */
-public class LoginConversation extends StringPrompt {
+class LoginConversation extends StringPrompt {
 
-	private String promptText;
+	private final String promptText;
 	
 	/**
 	 * @param promptText The prompt text
 	 */
-	public LoginConversation(String promptText) {
+	private LoginConversation(String promptText) {
 		this.promptText = promptText;
 	}
 	

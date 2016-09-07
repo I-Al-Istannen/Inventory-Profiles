@@ -1,15 +1,14 @@
 package me.ialistannen.inventory_profiles.runnables;
 
+import me.ialistannen.inventory_profiles.InventoryProfiles;
+import org.bukkit.scheduler.BukkitRunnable;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
-import org.bukkit.scheduler.BukkitRunnable;
-
-import me.ialistannen.inventory_profiles.InventoryProfiles;
 
 /**
  * Automatically saves the shops, to prevent corruption due to crashes.
@@ -74,10 +73,10 @@ public class AutoSaver extends BukkitRunnable {
 			Files.createDirectories(baseDir);
 		}
 
-		long amountofSaves = Files.list(baseDir).count();
+		long amountOfSaves = Files.list(baseDir).count();
 
 		// delete the oldest
-		if (amountofSaves >= InventoryProfiles.getInstance().getConfig().getInt("maximum backup amount")) {
+		if (amountOfSaves >= InventoryProfiles.getInstance().getConfig().getInt("maximum backup amount")) {
 			// lowest will be the first. Time gets bigger ==> Oldest the only
 			// remaining one
 			Files.list(baseDir).sorted((o1, o2) -> getLastModifiedTime(o1).compareTo(getLastModifiedTime(o2))).limit(1)

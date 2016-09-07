@@ -1,79 +1,69 @@
 package me.ialistannen.inventory_profiles.commands;
 
-import static me.ialistannen.inventory_profiles.util.Util.tr;
-
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
-
-import org.bukkit.command.CommandSender;
-
+import me.ialistannen.bukkitutil.commandsystem.base.CommandResultType;
+import me.ialistannen.bukkitutil.commandsystem.implementation.DefaultCommand;
 import me.ialistannen.inventory_profiles.InventoryProfiles;
 import me.ialistannen.inventory_profiles.players.Profile;
 import me.ialistannen.inventory_profiles.util.Util;
-import me.ialistannen.tree_command_system.CommandNode;
+import org.bukkit.command.CommandSender;
+
+import java.time.Duration;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static me.ialistannen.inventory_profiles.util.Util.getAllProfileNames;
+import static me.ialistannen.inventory_profiles.util.Util.tr;
 
 /**
  * Sets or shows the playtime for a user
  */
-public class CommandSetPlaytime extends CommandNode {
-	
+class CommandSetPlaytime extends DefaultCommand {
+
 	/**
 	 * New instance
 	 */
-	public CommandSetPlaytime() {
-		super(tr("subCommandSetPlaytime name"), tr("subCommandSetPlaytime keyword"),
-				Pattern.compile(tr("subCommandSetPlaytime pattern"), Pattern.CASE_INSENSITIVE),
-				Util.PERMISSION_PREFIX + ".setPlaytime");
-	}
-	
-	
-	@Override
-	public String getUsage() {
-		return tr("subCommandSetPlaytime usage", getName());
+	CommandSetPlaytime() {
+		super(InventoryProfiles.getInstance().getLanguage(), "command_set_playtime",
+				Util.tr("command_set_playtime_permission"), sender -> true);
 	}
 
 	@Override
-	public String getDescription() {
-		return tr("subCommandSetPlaytime description", getName());
-	}
-	
-	@Override
-	protected List<String> getTabCompletions(String input, List<String> wholeUserChat, CommandSender tabCompleter) {
-		List<String> toReturn = new ArrayList<>();
-		
-		if(wholeUserChat.size() == 2) {
-			toReturn.addAll(Util.getAllProfileNames());
+	public List<String> tabComplete(CommandSender sender, String alias, List<String> wholeUserChat,
+	                                int indexRelativeToYou) {
+
+		if (indexRelativeToYou == 0) {
+			return getAllProfileNames();
 		}
-		return toReturn;
+
+		return Collections.emptyList();
 	}
-	
+
+
 	@Override
-	public boolean execute(CommandSender sender, String... args) {
-		if(args.length < 2) {
-			return false;
+	public CommandResultType execute(CommandSender sender, String... args) {
+		if (args.length < 2) {
+			return CommandResultType.SEND_USAGE;
 		}
-		
+
 		Optional<Profile> optProf = InventoryProfiles.getProfileManager().getProfile(args[0]);
 		if (!optProf.isPresent()) {
 			sender.sendMessage(tr("username unknown", args[0]));
-			return true;
+			return CommandResultType.SUCCESSFUL;
 		}
 
 		Profile profile = optProf.get();
-		
+
 		Optional<Duration> durationOpt = Util.parseDurationString(args[1]);
-		
-		if(!durationOpt.isPresent()) {
+
+		if (!durationOpt.isPresent()) {
 			sender.sendMessage(tr("time not valid", args[1]));
-			return true;
+			return CommandResultType.SUCCESSFUL;
 		}
-		
+
 		profile.setAvaillablePlaytime(durationOpt.get());
 		sender.sendMessage(tr("set playtime", profile.getName(), Util.formatDuration(profile.getPlaytimeLeft())));
-		return true;
+		return CommandResultType.SUCCESSFUL;
 	}
 
 }

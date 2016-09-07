@@ -1,67 +1,57 @@
 package me.ialistannen.inventory_profiles.commands;
 
-import static me.ialistannen.inventory_profiles.util.Util.tr;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
-
-import org.bukkit.command.CommandSender;
-
+import me.ialistannen.bukkitutil.commandsystem.base.CommandResultType;
+import me.ialistannen.bukkitutil.commandsystem.implementation.DefaultCommand;
 import me.ialistannen.inventory_profiles.InventoryProfiles;
 import me.ialistannen.inventory_profiles.players.Profile;
 import me.ialistannen.inventory_profiles.util.Util;
-import me.ialistannen.tree_command_system.CommandNode;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static me.ialistannen.inventory_profiles.util.Util.getAllProfileNames;
+import static me.ialistannen.inventory_profiles.util.Util.tr;
 
 /**
  * Looks up the password of a player
  */
-public class CommandLookupPassword extends CommandNode {
-	
+class CommandLookupPassword extends DefaultCommand {
+
 	/**
 	 * New instance
 	 */
 	public CommandLookupPassword() {
-		super(tr("subCommandLookupPassword name"), tr("subCommandLookupPassword keyword"),
-				Pattern.compile(tr("subCommandLookupPassword pattern"), Pattern.CASE_INSENSITIVE),
-				Util.PERMISSION_PREFIX + ".lookupPassword");
-	}
-	
-	
-	@Override
-	public String getUsage() {
-		return tr("subCommandLookupPassword usage", getName());
+		super(InventoryProfiles.getInstance().getLanguage(), "command_lookup_password",
+				Util.tr("command_lookup_password_permission"), sender -> sender instanceof Player);
 	}
 
 	@Override
-	public String getDescription() {
-		return tr("subCommandLookupPassword description", getName());
-	}
-	
-	@Override
-	protected List<String> getTabCompletions(String input, List<String> wholeUserChat, CommandSender tabCompleter) {
-		List<String> toReturn = new ArrayList<>();
-		if(wholeUserChat.size() == 2) {
-			toReturn.addAll(Util.getAllProfileNames());
+	public List<String> tabComplete(CommandSender sender, String alias, List<String> wholeUserChat,
+	                                int indexRelativeToYou) {
+
+		if(indexRelativeToYou == 0) {
+			return getAllProfileNames();
 		}
-		return toReturn;
+		return Collections.emptyList();
 	}
 
 	@Override
-	public boolean execute(CommandSender sender, String... args) {
+	public CommandResultType execute(CommandSender sender, String... args) {
 		if(args.length < 1) {
-			return false;
+			return CommandResultType.SEND_USAGE;
 		}
 		
 		Optional<Profile> optProf = InventoryProfiles.getProfileManager().getProfile(args[0]);
 		if (!optProf.isPresent()) {
 			sender.sendMessage(tr("username unknown", args[0]));
-			return true;
+			return CommandResultType.SUCCESSFUL;
 		}
 
 		sender.sendMessage(tr("password lookuped", optProf.get().getName(), optProf.get().getPassword()));
-		return true;
+		return CommandResultType.SUCCESSFUL;
 	}
 
 }
