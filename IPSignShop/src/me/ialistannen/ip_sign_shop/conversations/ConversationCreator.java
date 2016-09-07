@@ -1,15 +1,14 @@
 package me.ialistannen.ip_sign_shop.conversations;
 
-import org.bukkit.conversations.ConversationFactory;
-
 import me.ialistannen.ip_sign_shop.IPSignShop;
+import org.bukkit.conversations.ConversationFactory;
 
 /**
  * The Conversation creator
  */
 public class ConversationCreator {
 
-	private ConversationFactory factory;
+	private final ConversationFactory factory;
 	
 	/**
 	 * @param plugin The Plugin
@@ -32,7 +31,8 @@ public class ConversationCreator {
 	 * @param timeoutSeconds The timeout in seconds
 	 * @return The resulting conversation factory
 	 */
-	public ConversationFactory getConversationFactory(String escapeSeq, boolean localEcho, boolean modality, int timeoutSeconds) {
+	private ConversationFactory getConversationFactory(String escapeSeq, boolean localEcho, boolean modality, int
+			timeoutSeconds) {
 		return factory
 				.withEscapeSequence(escapeSeq)
 				.withLocalEcho(localEcho)

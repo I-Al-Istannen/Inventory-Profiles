@@ -11,7 +11,7 @@ public class ExpUtil {
 	 * @param level The level
 	 * @return The total exp needed to get to the level
 	 */
-	public static int getXpForLevel(int level) {
+	private static int getXpForLevel(int level) {
 		int totalXp = 0;
 		for(int i = 1; i <= level; i++) {	
 			totalXp += getXpIncreaseAtLevel(i);
@@ -24,7 +24,7 @@ public class ExpUtil {
 	 * @param level The Level
 	 * @return The xp increase at the given level
 	 */
-	public static int getXpIncreaseAtLevel(int level) {
+	private static int getXpIncreaseAtLevel(int level) {
 		int xpPerLevel = 0;
 		for(int i = 1; i <= level; i++) {
 			if(i == 1) {
@@ -49,7 +49,7 @@ public class ExpUtil {
 	 * @param progress The Progress he has made
 	 * @return The Extra xp that is
 	 */
-	public static int getExtraXp(int level, float progress) {
+	private static int getExtraXp(int level, float progress) {
 		return Math.round(getXpIncreaseAtLevel(level) * progress);
 	}
 	
@@ -66,7 +66,7 @@ public class ExpUtil {
 	 * @param xp The Experience of the player
 	 * @return The level the player has.
 	 */
-	public static int getLevel(int xp) {
+	private static int getLevel(int xp) {
 		int level = 1;
 		for(; xp >= getXpIncreaseAtLevel(level) ; level++) {
 			xp -= getXpIncreaseAtLevel(level);
@@ -79,7 +79,7 @@ public class ExpUtil {
 	 * @param level The level the player is at
 	 * @return The Extra percentage the player is at
 	 */
-	public static float getExtraXpForLevel(int totalXp, int level) {
+	private static float getExtraXpForLevel(int totalXp, int level) {
 		totalXp -= getXpForLevel(level);
 		return (float) totalXp / getXpIncreaseAtLevel(level);
 	}

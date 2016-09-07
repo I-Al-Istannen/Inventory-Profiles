@@ -1,5 +1,11 @@
 package me.ialistannen.inventory_profiles.util;
 
+import me.ialistannen.inventory_profiles.InventoryProfiles;
+import me.ialistannen.inventory_profiles.players.Profile;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.time.Duration;
@@ -8,14 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-
-import me.ialistannen.inventory_profiles.InventoryProfiles;
-import me.ialistannen.inventory_profiles.language.IPLanguage;
-import me.ialistannen.inventory_profiles.players.Profile;
+import java.util.stream.Collectors;
 
 /**
  * A class with Util methods
@@ -87,7 +86,7 @@ public class Util {
 	 * @param pattern The Pattern
 	 * @return The formatted Duration
 	 */
-	public static String formatDuration(Duration duration, String pattern) {
+	private static String formatDuration(Duration duration, String pattern) {
 		boolean negative = duration.isNegative();
 		long days = duration.toDays();
 		duration = duration.minusDays(days);
@@ -120,8 +119,9 @@ public class Util {
 	/**
 	 * @param string The String to trim
 	 * @param size The Size to trim to
-	 * @return The trimmed String or the origian lone if it was inside the range
+	 * @return The trimmed String or the original one if it was inside the range
 	 */
+	@SuppressWarnings("SameParameterValue")
 	public static String trimToSize(String string, int size) {
 		return string.length() <= size ? string : string.substring(0, size);
 	}
@@ -145,7 +145,7 @@ public class Util {
 	 * @param input The Input to parse
 	 * @return The integer or an emtpy optional if it is an incorrect format
 	 */
-	public static Optional<Integer> getInteger(String input) {
+	private static Optional<Integer> getInteger(String input) {
 		try {
 			return Optional.of(Integer.parseInt(input));
 		} catch(NumberFormatException e) {
@@ -159,7 +159,7 @@ public class Util {
 	 */
 	public static Optional<Double> getDouble(String input) {
 		try {
-			return Optional.of(NumberFormat.getNumberInstance(IPLanguage.getLocale()).parse(input).doubleValue());
+			return Optional.of(NumberFormat.getNumberInstance(InventoryProfiles.getInstance().getLanguage().getLanguage()).parse(input).doubleValue());
 		} catch (ParseException e) {
 			return Optional.empty();
 		}
@@ -196,7 +196,7 @@ public class Util {
 	private static Optional<Integer> getIntResultOfFirstGroup(Pattern pattern, String input) {
 		Matcher matcher = pattern.matcher(input);
 		if(matcher.find()) {
-			String integer = matcher.group(1).replaceAll("[^\\d-+.+]", "");
+			String integer = matcher.group(1).replaceAll("[^0-9-+.+]", "");
 			return getInteger(integer);
 		}
 		return Optional.empty();
@@ -236,5 +236,23 @@ public class Util {
 		}
 		
 		return builder.toString();
+	}
+	
+	/**
+	 * @param key The key to translate
+	 * @param formattingObjects The formatting objects
+	 * @return The formatted String
+	 */
+	public static String tr(String key, Object... formattingObjects) {
+		return color(InventoryProfiles.getInstance().getLanguage().tr(key, formattingObjects));
+	}
+	
+	/**
+	 * A list with the names of all profiles
+	 * 
+	 * @return A List with the names of all Profiles
+	 */
+	public static List<String> getAllProfileNames() {
+		return InventoryProfiles.getProfileManager().getAll().stream().map(Profile::getName).collect(Collectors.toList());
 	}
 }

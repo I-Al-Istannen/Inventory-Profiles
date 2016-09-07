@@ -1,20 +1,23 @@
 package me.ialistannen.inventory_profiles.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A serializable version of the {@link Location}. Needed for < 1.8
  */
 public class LocationSerializable implements ConfigurationSerializable {
 
-	private double x,y,z;
-	private float yaw, pitch;
-	private String world;
+	private final double x;
+	private final double y;
+	private final double z;
+	private final float yaw;
+	private final float pitch;
+	private final String world;
 	
 	
 	/**
@@ -54,7 +57,7 @@ public class LocationSerializable implements ConfigurationSerializable {
 	 * @return The {@link Location} representation
 	 */
 	public Location toLocation() {
-		return new Location(Bukkit.getWorld(world), x, y, z, (float) yaw, (float) pitch);
+		return new Location(Bukkit.getWorld(world), x, y, z, yaw, pitch);
 	}
 
 	@Override

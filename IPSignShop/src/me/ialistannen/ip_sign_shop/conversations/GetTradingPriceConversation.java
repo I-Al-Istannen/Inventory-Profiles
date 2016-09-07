@@ -1,23 +1,22 @@
 package me.ialistannen.ip_sign_shop.conversations;
 
-import static me.ialistannen.ip_sign_shop.util.Language.tr;
-
-import java.text.NumberFormat;
-import java.text.ParseException;
-
+import me.ialistannen.ip_sign_shop.IPSignShop;
+import me.ialistannen.ip_sign_shop.datastorage.ShopMode;
 import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.Prompt;
 import org.bukkit.conversations.StringPrompt;
 
-import me.ialistannen.ip_sign_shop.datastorage.ShopMode;
-import me.ialistannen.ip_sign_shop.util.Language;
+import java.text.NumberFormat;
+import java.text.ParseException;
+
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
 
 /**
  * The Create shop conversation
  */
 public class GetTradingPriceConversation extends StringPrompt {
 
-	private String itemToTrade;
+	private final String itemToTrade;
 
 	private ConversationStage stage = ConversationStage.SHOP_MODE;
 	
@@ -68,7 +67,7 @@ public class GetTradingPriceConversation extends StringPrompt {
 	 */
 	private Double getDouble(String input) {
 		try {
-			return NumberFormat.getNumberInstance(Language.getLocale()).parse(input).doubleValue();
+			return NumberFormat.getNumberInstance(IPSignShop.getInstance().getLanguage().getLanguage()).parse(input).doubleValue();
 		} catch (ParseException e) {
 			return null;
 		}
@@ -84,7 +83,7 @@ public class GetTradingPriceConversation extends StringPrompt {
 		}
 	}
 	
-	private static enum ConversationStage {
+	private enum ConversationStage {
 		/**
 		 * Getting the Shop mode from the user
 		 */
@@ -92,7 +91,7 @@ public class GetTradingPriceConversation extends StringPrompt {
 		/**
 		 * Getting the price from the user
 		 */
-		PRICE;
+		PRICE
 	}
 	
 }

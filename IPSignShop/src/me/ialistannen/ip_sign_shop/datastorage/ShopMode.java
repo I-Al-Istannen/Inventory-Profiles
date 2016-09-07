@@ -1,6 +1,6 @@
 package me.ialistannen.ip_sign_shop.datastorage;
 
-import static me.ialistannen.ip_sign_shop.util.Language.tr;
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
 
 /**
  * The mode of the shop

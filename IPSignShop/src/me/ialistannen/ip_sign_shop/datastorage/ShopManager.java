@@ -1,5 +1,12 @@
 package me.ialistannen.ip_sign_shop.datastorage;
 
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Item;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
@@ -11,21 +18,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Item;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
+import java.util.stream.Collectors;
 
 /**
  * A manager for {@link Shop}s. Let's you perform some lookups and stuff.
  */
 public class ShopManager {
 
-	private Map<Location, Shop> signLocShopMap = new HashMap<>();
+	private final Map<Location, Shop> signLocShopMap = new HashMap<>();
 	
 	/**
 	 * Just there to allow the default constructor to be used
@@ -38,7 +38,7 @@ public class ShopManager {
 	 * 
 	 * @param signLocationShopMap All the known shops
 	 */
-	public ShopManager(Map<Location, Shop> signLocationShopMap) {
+	private ShopManager(Map<Location, Shop> signLocationShopMap) {
 		signLocShopMap.putAll(signLocationShopMap);
 	}
 	
@@ -55,13 +55,10 @@ public class ShopManager {
 	 * @return All the shops for the owner or an empty list if none.
 	 */
 	public List<Shop> getShopsForOwner(String owner) {
-		List<Shop> shops = new LinkedList<>();
-		for (Shop shop : signLocShopMap.values()) {
-			if(shop.getOwner().equals(owner)) {
-				shops.add(shop);
-			}
-		}
-		
+		List<Shop> shops = signLocShopMap.values().stream()
+				.filter(shop -> shop.getOwner().equals(owner))
+				.collect(Collectors.toCollection(LinkedList::new));
+
 		return shops;
 	}
 	
@@ -70,13 +67,10 @@ public class ShopManager {
 	 * @return All the shops that sell the given Material
 	 */
 	public List<Shop> getShopsForMaterial(Material mat) {
-		List<Shop> shops = new LinkedList<>();
-		for (Shop shop : signLocShopMap.values()) {
-			if(shop.getItem().getType() == mat) {
-				shops.add(shop);
-			}
-		}
-		
+		List<Shop> shops = signLocShopMap.values().stream()
+				.filter(shop -> shop.getItem().getType() == mat)
+				.collect(Collectors.toCollection(LinkedList::new));
+
 		return shops;
 	}
 	
@@ -85,13 +79,10 @@ public class ShopManager {
 	 * @return All the shops that sell the given item.
 	 */
 	public List<Shop> getShopsForItem(ItemStack item) {
-		List<Shop> shops = new LinkedList<>();
-		for (Shop shop : signLocShopMap.values()) {
-			if(shop.getItem().isSimilar(item)) {
-				shops.add(shop);
-			}
-		}
-		
+		List<Shop> shops = signLocShopMap.values().stream()
+				.filter(shop -> shop.getItem().isSimilar(item))
+				.collect(Collectors.toCollection(LinkedList::new));
+
 		return shops;
 	}
 	
@@ -181,8 +172,8 @@ public class ShopManager {
 	 * @param loc The Location to check
 	 * @return True if the sign at the given location is a shop sign
 	 */
-	public boolean isShopSign(Location loc) {
-		return hasShopAtLocation(loc);
+	public boolean isNoShopSign(Location loc) {
+		return !hasShopAtLocation(loc);
 	}
 	
 	/**
@@ -202,18 +193,14 @@ public class ShopManager {
 	 * Despawns the shop items for every shop. To be used in onDisable to prevent item duplication at the next restart.
 	 */
 	public void despawnAllItems() {
-		for (Shop shop : getAllShops()) {
-			shop.despawnItem();
-		}
+		getAllShops().forEach(Shop::despawnItem);
 	}
 	
 	/**
 	 * Updates all shops
 	 */
 	public void updateAllShops() {
-		for (Shop shop : getAllShops()) {
-			shop.updateShop();
-		}
+		getAllShops().forEach(Shop::updateShop);
 	}
 	
 	/**
@@ -233,13 +220,11 @@ public class ShopManager {
 		
 		YamlConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
 		Map<Location, Shop> map = new HashMap<>();
-		
-		for (Entry<String, Object> entry : config.getValues(false).entrySet()) {
-			if(entry.getValue() instanceof Shop) {
-				Shop shop = (Shop) entry.getValue();
-				map.put(shop.getSignLocation(), shop);
-			}
-		}
+
+		config.getValues(false).entrySet().stream()
+				.filter(entry -> entry.getValue() instanceof Shop)
+				.map(entry -> (Shop) entry.getValue())
+				.forEach(shop -> map.put(shop.getSignLocation(), shop));
 		
 		return new ShopManager(map);
 	}

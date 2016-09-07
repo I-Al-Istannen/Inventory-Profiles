@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="IPSignShop Plugin:jar">
+    <output-path>S:/Minecraft/Bukkit Server/1.8.8 clean/plugins/update</output-path>
+    <root id="archive" name="IPSignShop.jar">
+      <element id="module-output" name="IPSignShop" />
+      <element id="module-output" name="InventoryProfiles New" />
+    </root>
+  </artifact>
+</component>

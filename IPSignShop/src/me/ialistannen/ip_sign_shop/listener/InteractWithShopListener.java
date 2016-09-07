@@ -1,19 +1,5 @@
 package me.ialistannen.ip_sign_shop.listener;
 
-import static me.ialistannen.ip_sign_shop.util.Language.tr;
-
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.conversations.Conversation;
-import org.bukkit.conversations.ConversationAbandonedEvent;
-import org.bukkit.conversations.ConversationAbandonedListener;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
-
 import me.ialistannen.inventory_profiles.InventoryProfiles;
 import me.ialistannen.ip_sign_shop.IPSignShop;
 import me.ialistannen.ip_sign_shop.conversations.ConfirmationConversation;
@@ -21,6 +7,18 @@ import me.ialistannen.ip_sign_shop.conversations.GetBuyAmountConversation;
 import me.ialistannen.ip_sign_shop.datastorage.Shop;
 import me.ialistannen.ip_sign_shop.datastorage.ShopMode;
 import me.ialistannen.ip_sign_shop.util.IPSignShopUtil;
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.conversations.Conversation;
+import org.bukkit.conversations.ConversationAbandonedEvent;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
+
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
 
 /**
  * Listens for interactions with a shop
@@ -38,7 +36,7 @@ public class InteractWithShopListener implements Listener {
 			return;
 		}
 		
-		if(!IPSignShop.getShopManager().isShopSign(e.getClickedBlock().getLocation())) {
+		if(IPSignShop.getShopManager().isNoShopSign(e.getClickedBlock().getLocation())) {
 			return;
 		}
 		
@@ -69,13 +67,9 @@ public class InteractWithShopListener implements Listener {
 				.withFirstPrompt(new GetBuyAmountConversation(shop.getMode().getOpposite(), suffix))
 				.buildConversation(e.getPlayer());
 		
-		conversation.addConversationAbandonedListener(new ConversationAbandonedListener() {
-			
-			@Override
-			public void conversationAbandoned(ConversationAbandonedEvent abandonedEvent) {
-				handlePlayerGetBuyAmountConversationEnd(abandonedEvent, shop);
-			}
-		});
+		conversation.addConversationAbandonedListener(abandonedEvent ->
+				handlePlayerGetBuyAmountConversationEnd(abandonedEvent, shop)
+		);
 		
 		conversation.begin();
 	}
@@ -109,26 +103,22 @@ public class InteractWithShopListener implements Listener {
 				.withFirstPrompt(new ConfirmationConversation(promptMessage))
 				.buildConversation(player);
 		
-		conversation.addConversationAbandonedListener(new ConversationAbandonedListener() {
-			
-			@Override
-			public void conversationAbandoned(ConversationAbandonedEvent abandonedEvent) {
-				if(!abandonedEvent.gracefulExit()) {
-					abandonedEvent.getContext().getForWhom().sendRawMessage(tr("conversation cancelled"));
-					return;
+		conversation.addConversationAbandonedListener(abandonedEvent -> {
+			if(!abandonedEvent.gracefulExit()) {
+				abandonedEvent.getContext().getForWhom().sendRawMessage(tr("conversation cancelled"));
+				return;
+			}
+
+			if((Boolean) abandonedEvent.getContext().getSessionData("result")) {
+				if(shop.getMode() == ShopMode.BUY || shop.getMode() == ShopMode.BUY_UNLIMITED) {
+					handleSellToShop(shop, player, amount);
 				}
-				
-				if((Boolean) abandonedEvent.getContext().getSessionData("result")) {
-					if(shop.getMode() == ShopMode.BUY || shop.getMode() == ShopMode.BUY_UNLIMITED) {
-						handleSellToShop(shop, player, amount);
-					}
-					else if(shop.getMode() == ShopMode.SELL || shop.getMode() == ShopMode.SELL_UNLIMITED) {
-						handleBuyFromShop(shop, player, amount);
-					}						
+				else if(shop.getMode() == ShopMode.SELL || shop.getMode() == ShopMode.SELL_UNLIMITED) {
+					handleBuyFromShop(shop, player, amount);
 				}
-				else {
-					abandonedEvent.getContext().getForWhom().sendRawMessage(tr("interact with shop cancelled trade"));
-				}
+			}
+			else {
+				abandonedEvent.getContext().getForWhom().sendRawMessage(tr("interact with shop cancelled trade"));
 			}
 		});
 		

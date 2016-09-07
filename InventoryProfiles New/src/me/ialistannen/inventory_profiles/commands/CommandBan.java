@@ -1,50 +1,52 @@
 package me.ialistannen.inventory_profiles.commands;
 
-import static me.ialistannen.inventory_profiles.language.IPLanguage.tr;
+import me.ialistannen.bukkitutil.commandsystem.base.CommandResultType;
+import me.ialistannen.bukkitutil.commandsystem.implementation.DefaultCommand;
+import me.ialistannen.inventory_profiles.InventoryProfiles;
+import me.ialistannen.inventory_profiles.players.Profile;
+import me.ialistannen.inventory_profiles.util.Util;
+import org.bukkit.command.CommandSender;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.bukkit.command.CommandSender;
-
-import me.ialistannen.inventory_profiles.InventoryProfiles;
-import me.ialistannen.inventory_profiles.players.Profile;
-import me.ialistannen.inventory_profiles.util.Util;
+import static me.ialistannen.inventory_profiles.util.Util.tr;
 
 /**
  * Lets you ban a player
  */
-public class CommandBan extends CommandPreset {
+class CommandBan extends DefaultCommand {
 
 	/**
-	 * A new {@link CommandBan} instance
+	 * New instance
 	 */
 	public CommandBan() {
-		super(Util.PERMISSION_PREFIX + ".ban", false);
+		super(InventoryProfiles.getInstance().getLanguage(), "command_ban",
+				Util.tr("command_ban_permission"), sender -> true);
 	}
-	
+
 	@Override
-	public List<String> onTabComplete(int position, List<String> messages) {
-		List<String> toReturn = new ArrayList<>();
-		if(position == 0) {
-			toReturn.addAll(getAllProfileNames());
+	public List<String> tabComplete(CommandSender sender, String alias, List<String> wholeUserChat,
+	                                int indexRelativeToYou) {
+		if(indexRelativeToYou == 0) {
+			return Util.getAllProfileNames();
 		}
-		return toReturn;
+		return Collections.emptyList();
 	}
 	
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
+	public CommandResultType execute(CommandSender sender, String... args) {
 		if(args.length < 3) {
-			return false;
+			return CommandResultType.SEND_USAGE;
 		}
 		
 		if(!InventoryProfiles.getProfileManager().hasProfile(args[0])) {
 			sender.sendMessage(tr("username unknown", args[0]));
-			return true;
+			return CommandResultType.SUCCESSFUL;
 		}
 		
 		Profile profile = InventoryProfiles.getProfileManager().getProfile(args[0]).get();
@@ -53,7 +55,7 @@ public class CommandBan extends CommandPreset {
 		
 		if(!banTime.isPresent()) {
 			sender.sendMessage(tr("time not valid", args[1]));
-			return true;
+			return CommandResultType.SUCCESSFUL;
 		}
 		
 		String reason = Arrays.stream(args).skip(2).collect(Collectors.joining(" "));
@@ -64,7 +66,7 @@ public class CommandBan extends CommandPreset {
 		
 		sender.sendMessage(tr("banned player", profile.getName(), Util.formatDuration(banTime.get()), reason));
 		
-		return true;
+		return CommandResultType.SUCCESSFUL;
 	}
 
 }

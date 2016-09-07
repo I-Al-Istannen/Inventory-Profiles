@@ -2,6 +2,7 @@ name: "InventoryProfiles"
 version: 1.0
 main: me.ialistannen.inventory_profiles.InventoryProfiles
 softdepend: [Vault,WorldGuard,MultiWorld]
+depend: [I_Al_Istannen_Util]
 author: "I Al Istannen"
 commands:
   inventoryProfiles:

@@ -1,16 +1,15 @@
 package me.ialistannen.ip_sign_shop.conversations;
 
-import static me.ialistannen.ip_sign_shop.util.Language.tr;
-
-import java.text.NumberFormat;
-import java.text.ParseException;
-
+import me.ialistannen.ip_sign_shop.IPSignShop;
+import me.ialistannen.ip_sign_shop.datastorage.ShopMode;
 import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.Prompt;
 import org.bukkit.conversations.StringPrompt;
 
-import me.ialistannen.ip_sign_shop.datastorage.ShopMode;
-import me.ialistannen.ip_sign_shop.util.Language;
+import java.text.NumberFormat;
+import java.text.ParseException;
+
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
 
 /**
  * The conversation prompting you for the amount of things you want to buy
@@ -19,8 +18,8 @@ import me.ialistannen.ip_sign_shop.util.Language;
  */
 public class GetBuyAmountConversation extends StringPrompt {
 
-	private String suffix;
-	private ShopMode shopMode;
+	private final String suffix;
+	private final ShopMode shopMode;
 
 	
 	/**
@@ -53,17 +52,17 @@ public class GetBuyAmountConversation extends StringPrompt {
 	 * @return The parsed int or null if not a number.
 	 */
 	private Integer getInt(String input) {
-		NumberFormat format = NumberFormat.getNumberInstance(Language.getLocale());
+		NumberFormat format = NumberFormat.getNumberInstance(IPSignShop.getInstance().getLanguage().getLanguage());
 		format.setParseIntegerOnly(true);
 		
 		try {
 			return format.parse(input).intValue();
-		} catch(ParseException e) {
+		} catch(ParseException ignore) {
 		}
 		
 		try {
 			return Integer.parseInt(input, 16);
-		} catch(NumberFormatException e) {			
+		} catch(NumberFormatException ignore) {
 		}
 		
 		return null;

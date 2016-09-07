@@ -1,38 +1,53 @@
 package me.ialistannen.inventory_profiles.commands;
 
-import static me.ialistannen.inventory_profiles.language.IPLanguage.tr;
+import me.ialistannen.bukkitutil.commandsystem.base.CommandResultType;
+import me.ialistannen.bukkitutil.commandsystem.implementation.DefaultCommand;
+import me.ialistannen.inventory_profiles.InventoryProfiles;
+import me.ialistannen.inventory_profiles.hooks.LanguageEventReceiverHook.ChangeType;
+import me.ialistannen.inventory_profiles.util.Util;
+import me.ialistannen.languageSystem.I18N;
+import me.ialistannen.languageSystem.MessageProvider;
+import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
 
-import org.bukkit.command.CommandSender;
-
-import me.ialistannen.inventory_profiles.language.IPLanguage;
-import me.ialistannen.inventory_profiles.util.Util;
+import static me.ialistannen.inventory_profiles.util.Util.tr;
 
 /**
  * Reloads the Language files
  */
-public class CommandLanguageReload extends CommandPreset {
+class CommandLanguageReload extends DefaultCommand {
 
 	/**
-	 * Reloads the language files
+	 * New instance
 	 */
-	public CommandLanguageReload() {
-		super(Util.PERMISSION_PREFIX + ".languageReload", false);
+	CommandLanguageReload() {
+		super(InventoryProfiles.getInstance().getLanguage(), "command_language_reload",
+				Util.tr("command_language_reload_permission"), sender -> true);
 	}
-	
+
 	@Override
-	public List<String> onTabComplete(int position, List<String> messages) {
+	public List<String> tabComplete(CommandSender sender, String alias, List<String> wholeUserChat,
+	                                int indexRelativeToYou) {
 		return Collections.emptyList();
 	}
-	
+
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		IPLanguage.setLocale(IPLanguage.getLocale());
-		
+	public CommandResultType execute(CommandSender sender, String... args) {
+		MessageProvider provider = InventoryProfiles.getInstance().getLanguage();
+		if (provider instanceof I18N) {
+			((I18N) provider).reload();
+		}
+
+		InventoryProfiles.getInstance().reloadCommands();
+		InventoryProfiles.getInstance().getHookManager()
+				.callLanguageChangeEvent(
+						ChangeType.RELOADED, InventoryProfiles.getInstance().getCurrentLocale()
+				);
+
 		sender.sendMessage(tr("reloaded language files"));
-		return true;
+		return CommandResultType.SUCCESSFUL;
 	}
 
 }

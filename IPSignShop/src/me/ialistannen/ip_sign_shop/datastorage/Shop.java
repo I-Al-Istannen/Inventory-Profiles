@@ -1,10 +1,8 @@
 package me.ialistannen.ip_sign_shop.datastorage;
 
-import static me.ialistannen.ip_sign_shop.util.Language.tr;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import me.ialistannen.inventory_profiles.util.LocationSerializable;
+import me.ialistannen.ip_sign_shop.IPSignShop;
+import me.ialistannen.ip_sign_shop.util.IPSignShopUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Chest;
@@ -16,10 +14,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import me.ialistannen.inventory_profiles.util.LocationSerializable;
-import me.ialistannen.ip_sign_shop.IPSignShop;
-import me.ialistannen.ip_sign_shop.util.IPSignShopUtil;
-import me.ialistannen.ip_sign_shop.util.Language;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.trItem;
 
 /**
  * Represents a single shop
@@ -27,8 +26,9 @@ import me.ialistannen.ip_sign_shop.util.Language;
 public class Shop implements ConfigurationSerializable {
 	
 	private String owner;
-	private ItemStack item;
-	private Location signLocation, chestLocation;
+	private final ItemStack item;
+	private final Location signLocation;
+	private final Location chestLocation;
 	private ShopMode mode;
 	private double price;
 	private Item displayItem;
@@ -181,10 +181,10 @@ public class Shop implements ConfigurationSerializable {
 		
 		String[] lines = new String[4];
 		// owner, mode, item name, price
-		lines[0] = Language.tr("sign line 1", getOwner(), getMode().getShopModeName(), getItemName(), getPrice());
-		lines[1] = Language.tr("sign line 2", getOwner(), getMode().getShopModeName(), getItemName(), getPrice());
-		lines[2] = Language.tr("sign line 3", getOwner(), getMode().getShopModeName(), getItemName(), getPrice());
-		lines[3] = Language.tr("sign line 4", getOwner(), getMode().getShopModeName(), getItemName(), getPrice());
+		lines[0] = tr("sign line 1", getOwner(), getMode().getShopModeName(), getItemName(), getPrice());
+		lines[1] = tr("sign line 2", getOwner(), getMode().getShopModeName(), getItemName(), getPrice());
+		lines[2] = tr("sign line 3", getOwner(), getMode().getShopModeName(), getItemName(), getPrice());
+		lines[3] = tr("sign line 4", getOwner(), getMode().getShopModeName(), getItemName(), getPrice());
 
 		sign.setLine(0, lines[0]);
 		sign.setLine(1, lines[1]);
@@ -250,8 +250,8 @@ public class Shop implements ConfigurationSerializable {
 	/**
 	 * @return True if this shop has at least one item left
 	 */
-	public boolean hasItemsLeft() {
-		return getItemAmount() != 0;
+	public boolean hasNoItemsLeft() {
+		return getItemAmount() == 0;
 	}
 	
 	/**
@@ -259,7 +259,7 @@ public class Shop implements ConfigurationSerializable {
 	 * @return True if an item was removed
 	 */
 	public boolean removeItems(int amount) {
-		if(!hasItemsLeft()) {
+		if(hasNoItemsLeft()) {
 			return false;
 		}
 		
@@ -307,7 +307,7 @@ public class Shop implements ConfigurationSerializable {
 	public String getItemName() {	
 		return getItem().hasItemMeta() && getItem().getItemMeta().hasDisplayName()
 				? getItem().getItemMeta().getDisplayName()
-				: Language.translateItemName(getItem().getType());
+				: trItem(getItem().getType());
 	}
 	
 	/**

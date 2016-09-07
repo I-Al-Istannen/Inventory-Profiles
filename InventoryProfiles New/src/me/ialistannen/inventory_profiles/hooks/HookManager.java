@@ -1,43 +1,83 @@
 package me.ialistannen.inventory_profiles.hooks;
 
-import java.util.logging.Level;
-
 import me.ialistannen.inventory_profiles.InventoryProfiles;
+import me.ialistannen.inventory_profiles.hooks.LanguageEventReceiverHook.ChangeType;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.logging.Level;
 
 /**
  * Manages the hooks
  */
 public class HookManager {
 
+	private MoneyHook moneyHook;
+	private RegionHook regionHook;
+
+	private final List<LanguageEventReceiverHook> eventReceiverHooks = new ArrayList<>();
+
+	/**
+	 * Registers a {@link LanguageEventReceiverHook}
+	 *
+	 * @param receiverHook The {@link LanguageEventReceiverHook} to register
+	 */
+	public void registerLanguageReceiverHook(LanguageEventReceiverHook receiverHook) {
+		eventReceiverHooks.add(receiverHook);
+	}
+
+	/**
+	 * Notifies all receivers about the change
+	 *
+	 * @param changeType The Type of the change
+	 * @param language   The language after the event.
+	 */
+	public void callLanguageChangeEvent(ChangeType changeType, Locale language) {
+		eventReceiverHooks.forEach(receiverHook -> receiverHook.onLanguageEvent(changeType, language));
+	}
+
 	/**
 	 * @return The money hook. Working or not.
 	 */
-	public static MoneyHook getMoneyHook() {
-		VaultMoneyHook vault = new VaultMoneyHook();
-		
-		if(vault.isWorking()) {
-			InventoryProfiles.getInstance().getLogger().info("Hooked into " + vault.getName() + " through vault");
+	public MoneyHook getMoneyHook() {
+		if (moneyHook == null) {
+			moneyHook = new VaultMoneyHook();
 		}
 		else {
-			InventoryProfiles.getInstance().getLogger().log(Level.WARNING, "Error with money hook: " + vault.getErrorMessage());
+			return moneyHook;
 		}
-		
-		return vault;
+
+		if (moneyHook.isWorking()) {
+			InventoryProfiles.getInstance().getLogger().info("Hooked into " + moneyHook.getName() + " through vault");
+		}
+		else {
+			InventoryProfiles.getInstance().getLogger().log(Level.WARNING, "Error with money hook: "
+					+ moneyHook.getErrorMessage());
+		}
+
+		return moneyHook;
 	}
-	
+
 	/**
 	 * @return The {@link RegionHook}. Working or not.
 	 */
-	public static RegionHook getRegionHook() {
-		WorldGuardHook worldGuard = new WorldGuardHook();
-		
-		if(worldGuard.isWorking()) {
-			InventoryProfiles.getInstance().getLogger().info("Hooked into " + worldGuard.getName() + ".");
+	public RegionHook getRegionHook() {
+		if (regionHook == null) {
+			regionHook = new WorldGuardHook();
 		}
 		else {
-			InventoryProfiles.getInstance().getLogger().log(Level.WARNING, "Error with money hook: " + worldGuard.getErrorMessage());
+			return regionHook;
 		}
-		
-		return worldGuard;
+
+		if (regionHook.isWorking()) {
+			InventoryProfiles.getInstance().getLogger().info("Hooked into " + regionHook.getName() + ".");
+		}
+		else {
+			InventoryProfiles.getInstance().getLogger().log(Level.WARNING, "Error with region hook: "
+					+ regionHook.getErrorMessage());
+		}
+
+		return regionHook;
 	}
 }

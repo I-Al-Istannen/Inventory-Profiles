@@ -1,40 +1,44 @@
 package me.ialistannen.inventory_profiles.commands;
 
-import static me.ialistannen.inventory_profiles.language.IPLanguage.tr;
+import me.ialistannen.bukkitutil.commandsystem.base.CommandResultType;
+import me.ialistannen.bukkitutil.commandsystem.implementation.DefaultCommand;
+import me.ialistannen.inventory_profiles.InventoryProfiles;
+import me.ialistannen.inventory_profiles.util.Util;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
 
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
-import me.ialistannen.inventory_profiles.InventoryProfiles;
+import static me.ialistannen.inventory_profiles.util.Util.tr;
 
 /**
  * Logs a player out
  */
-public class CommandLogout extends CommandPreset {
+class CommandLogout extends DefaultCommand {
 
 	/**
-	 * Constructs an instance.
+	 * New instance
 	 */
 	public CommandLogout() {
-		super("", true);
+		super(InventoryProfiles.getInstance().getLanguage(), "command_logout",
+				Util.tr("command_logout_permission"), sender -> sender instanceof Player);
 	}
-	
+
 	@Override
-	public List<String> onTabComplete(int position, List<String> messages) {
+	public List<String> tabComplete(CommandSender sender, String alias, List<String> wholeUserChat,
+	                                int indexRelativeToYou) {
+
 		return Collections.emptyList();
 	}
-	
+
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		
+	public CommandResultType execute(CommandSender sender, String... args) {
 		Player player = (Player) sender;
-		
+
 		if(!InventoryProfiles.getProfileManager().hasProfile(player.getDisplayName())) {
 			player.sendMessage(tr("not logged in"));
-			return true;
+			return CommandResultType.SUCCESSFUL;
 		}
 		
 		player.sendMessage(tr("logged out"));
@@ -42,6 +46,6 @@ public class CommandLogout extends CommandPreset {
 		InventoryProfiles.getProfileManager().handlePlayerQuit(player);
 		InventoryProfiles.getProfileManager().handlePlayerJoin(player);
 		
-		return true;
+		return CommandResultType.SUCCESSFUL;
 	}
 }

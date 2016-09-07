@@ -1,43 +1,60 @@
 package me.ialistannen.inventory_profiles.commands;
 
+import me.ialistannen.bukkitutil.commandsystem.base.CommandResultType;
+import me.ialistannen.bukkitutil.commandsystem.implementation.DefaultCommand;
+import me.ialistannen.inventory_profiles.InventoryProfiles;
+import me.ialistannen.inventory_profiles.hooks.LanguageEventReceiverHook.ChangeType;
+import me.ialistannen.inventory_profiles.util.Util;
+import org.bukkit.command.CommandSender;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import org.bukkit.command.CommandSender;
-
-import me.ialistannen.inventory_profiles.language.IPLanguage;
-import me.ialistannen.inventory_profiles.util.Util;
-
 /**
  * Sets the currently used language
  */
-public class CommandLanguageSet extends CommandPreset {
+class CommandLanguageSet extends DefaultCommand {
 
 	/**
-	 * A new instance
+	 * New instance
 	 */
 	public CommandLanguageSet() {
-		super(Util.PERMISSION_PREFIX + ".languageSet", false);
+		super(InventoryProfiles.getInstance().getLanguage(), "command_language_set",
+				Util.tr("command_language_set_permission"), sender -> true);
 	}
-	
+
 	@Override
-	public List<String> onTabComplete(int position, List<String> messages) {
+	public List<String> tabComplete(CommandSender sender, String alias, List<String> wholeUserChat,
+	                                int indexRelativeToYou) {
+
 		return Collections.emptyList();
 	}
-	
+
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		if(args.length < 1) {
-			return false;
+	public CommandResultType execute(CommandSender sender, String... args) {
+		if (args.length < 1) {
+			return CommandResultType.SEND_USAGE;
 		}
-		
+
 		Locale locale = Locale.forLanguageTag(args[0]);
-		
-		IPLanguage.setLocale(locale);
-		sender.sendMessage(IPLanguage.tr("language set", IPLanguage.getLocale().getDisplayName()));
-		
-		return true;
+
+		Locale old = InventoryProfiles.getInstance().getCurrentLocale();
+		InventoryProfiles.getInstance().getLanguage().setLanguage(locale);
+		sender.sendMessage(Util.tr("language set",
+				InventoryProfiles.getInstance().getCurrentLocale().getDisplayName()));
+
+
+		// reload the commands to reinitialize the keywords (if needed)
+		if (!old.equals(InventoryProfiles.getInstance().getCurrentLocale())) {
+			InventoryProfiles.getInstance().reloadCommands();
+			InventoryProfiles.getInstance().getHookManager()
+					.callLanguageChangeEvent(
+							ChangeType.LOCALE_SET, InventoryProfiles.getInstance().getCurrentLocale()
+					);
+		}
+
+		return CommandResultType.SUCCESSFUL;
 	}
 
 }

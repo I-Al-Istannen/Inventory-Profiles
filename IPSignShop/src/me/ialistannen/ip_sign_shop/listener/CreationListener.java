@@ -1,14 +1,15 @@
 package me.ialistannen.ip_sign_shop.listener;
 
-import static me.ialistannen.ip_sign_shop.util.Language.tr;
-
+import me.ialistannen.ip_sign_shop.IPSignShop;
+import me.ialistannen.ip_sign_shop.conversations.GetTradingPriceConversation;
+import me.ialistannen.ip_sign_shop.datastorage.Shop;
+import me.ialistannen.ip_sign_shop.datastorage.ShopMode;
+import me.ialistannen.ip_sign_shop.util.IPSignShopUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
 import org.bukkit.conversations.Conversation;
-import org.bukkit.conversations.ConversationAbandonedEvent;
-import org.bukkit.conversations.ConversationAbandonedListener;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -17,11 +18,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import me.ialistannen.ip_sign_shop.IPSignShop;
-import me.ialistannen.ip_sign_shop.conversations.GetTradingPriceConversation;
-import me.ialistannen.ip_sign_shop.datastorage.Shop;
-import me.ialistannen.ip_sign_shop.datastorage.ShopMode;
-import me.ialistannen.ip_sign_shop.util.Language;
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
 
 /**
  * Listens for the creation if a shop
@@ -72,7 +69,7 @@ public class CreationListener implements Listener {
 		
 		String itemName = (e.getItem().hasItemMeta() && e.getItem().getItemMeta().hasDisplayName())
 				? e.getItem().getItemMeta().getDisplayName()
-				: Language.translateItemName(e.getItem().getType());
+				: IPSignShopUtil.trItem(e.getItem().getType());
 		
 		final Location signLoc = e.getClickedBlock().getRelative(e.getBlockFace()).getLocation();
 
@@ -94,31 +91,27 @@ public class CreationListener implements Listener {
 				.withFirstPrompt(new GetTradingPriceConversation(itemName))
 				.buildConversation(e.getPlayer());
 
-		conversation.addConversationAbandonedListener(new ConversationAbandonedListener() {
-			
-			@Override
-			public void conversationAbandoned(ConversationAbandonedEvent event) {
-				if(event.gracefulExit()) {
-					Double amount = (Double) event.getContext().getSessionData("amount");
-					
-					Shop shop = new Shop(e.getPlayer().getDisplayName(), e.getItem(), signLoc,
-							e.getClickedBlock().getLocation(), (ShopMode) event.getContext().getSessionData("mode"), amount);
-					
-					if(IPSignShop.getShopManager().hasShopAtLocation(signLoc)) {
-						e.getPlayer().sendMessage(tr("creation listener shop already exists"));
-						return;
-					}
-					
-					if(shop.getChestLocation().getBlock().getType() != Material.CHEST) {
-						e.getPlayer().sendMessage(tr("creation listener chest was destroyed"));
-						return;
-					}
-					
-					IPSignShop.getShopManager().addShop(shop);
+		conversation.addConversationAbandonedListener(event -> {
+			if(event.gracefulExit()) {
+				Double amount = (Double) event.getContext().getSessionData("amount");
+
+				Shop shop = new Shop(e.getPlayer().getDisplayName(), e.getItem(), signLoc,
+						e.getClickedBlock().getLocation(), (ShopMode) event.getContext().getSessionData("mode"), amount);
+
+				if(IPSignShop.getShopManager().hasShopAtLocation(signLoc)) {
+					e.getPlayer().sendMessage(tr("creation listener shop already exists"));
+					return;
 				}
-				else {
-					event.getContext().getForWhom().sendRawMessage(tr("conversation cancelled"));
+
+				if(shop.getChestLocation().getBlock().getType() != Material.CHEST) {
+					e.getPlayer().sendMessage(tr("creation listener chest was destroyed"));
+					return;
 				}
+
+				IPSignShop.getShopManager().addShop(shop);
+			}
+			else {
+				event.getContext().getForWhom().sendRawMessage(tr("conversation cancelled"));
 			}
 		});
 		conversation.begin();

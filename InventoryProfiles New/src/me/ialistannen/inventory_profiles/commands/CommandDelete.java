@@ -1,55 +1,58 @@
 package me.ialistannen.inventory_profiles.commands;
 
-import static me.ialistannen.inventory_profiles.language.IPLanguage.tr;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.bukkit.command.CommandSender;
-
+import me.ialistannen.bukkitutil.commandsystem.base.CommandResultType;
+import me.ialistannen.bukkitutil.commandsystem.implementation.DefaultCommand;
 import me.ialistannen.inventory_profiles.InventoryProfiles;
 import me.ialistannen.inventory_profiles.players.Profile;
 import me.ialistannen.inventory_profiles.util.Util;
+import org.bukkit.command.CommandSender;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static me.ialistannen.inventory_profiles.util.Util.getAllProfileNames;
+import static me.ialistannen.inventory_profiles.util.Util.tr;
 
 /**
  * Deletes a profile
  */
-public class CommandDelete extends CommandPreset {
+class CommandDelete extends DefaultCommand {
 
 	/**
-	 * Deletes a profile
+	 * New instance
 	 */
 	public CommandDelete() {
-		super(Util.PERMISSION_PREFIX + ".delete", false);
+		super(InventoryProfiles.getInstance().getLanguage(), "command_delete",
+				Util.tr("command_delete_permission"), sender -> true);
 	}
-	
+
 	@Override
-	public List<String> onTabComplete(int position, List<String> messages) {
-		List<String> toReturn = new ArrayList<>();
-		if(position == 0) {
-			toReturn.addAll(getAllProfileNames());
+	public List<String> tabComplete(CommandSender sender, String alias, List<String> wholeUserChat,
+	                                int indexRelativeToYou) {
+		if (indexRelativeToYou == 0) {
+			return getAllProfileNames();
 		}
-		return toReturn;
+		return Collections.emptyList();
 	}
-	
+
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		if(args.length < 1) {
-			return false;
+	public CommandResultType execute(CommandSender sender, String... args) {
+		if (args.length < 1) {
+			return CommandResultType.SEND_USAGE;
 		}
-		
+
 		Optional<Profile> profileOpt = InventoryProfiles.getProfileManager().getProfile(args[0]);
-		
-		if(!profileOpt.isPresent()) {
+
+		if (!profileOpt.isPresent()) {
 			sender.sendMessage(tr("username unknown"));
-			return true;
+			return CommandResultType.SUCCESSFUL;
 		}
-		
+
 		InventoryProfiles.getProfileManager().removeProfile(profileOpt.get());
-		
-		sender.sendMessage(tr("deleted profile", profileOpt.get().getName()));		
-		return true;
+
+		sender.sendMessage(tr("deleted profile", profileOpt.get().getName()));
+		return CommandResultType.SUCCESSFUL;
 	}
 
 }

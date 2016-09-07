@@ -1,6 +1,7 @@
 package me.ialistannen.ip_sign_shop.listener;
 
-import static me.ialistannen.ip_sign_shop.util.Language.tr;
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.tr;
+import static me.ialistannen.ip_sign_shop.util.IPSignShopUtil.trItem;
 
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -13,7 +14,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import me.ialistannen.ip_sign_shop.IPSignShop;
 import me.ialistannen.ip_sign_shop.datastorage.Shop;
 import me.ialistannen.ip_sign_shop.util.IPSignShopUtil;
-import me.ialistannen.ip_sign_shop.util.Language;
 
 /**
  * Protects the contents of the chest
@@ -118,7 +118,7 @@ public class ProtectShopContentsListener implements Listener {
 		}
 		
 		e.setCancelled(true);
-		e.getWhoClicked().sendMessage(tr("shop inventory you can only store shop items", Language.translateItemName(e.getCursor().getType()), shop.getItemName()));
+		e.getWhoClicked().sendMessage(tr("shop inventory you can only store shop items", trItem(e.getCursor().getType()), shop.getItemName()));
 	}
 
 }

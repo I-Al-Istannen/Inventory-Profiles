@@ -1,7 +1,7 @@
 package me.ialistannen.ip_sign_shop.listener;
 
-import java.util.Iterator;
-
+import me.ialistannen.ip_sign_shop.IPSignShop;
+import me.ialistannen.ip_sign_shop.datastorage.Shop;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
@@ -16,8 +16,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
 
-import me.ialistannen.ip_sign_shop.IPSignShop;
-import me.ialistannen.ip_sign_shop.datastorage.Shop;
+import java.util.Iterator;
 
 /**
  * Prevents the chest from being destroyed
@@ -116,7 +115,7 @@ public class DestroyListener implements Listener {
 	 * @return True if the event should be cancelled
 	 */
 	private boolean shouldBeCancelledBlock(Location loc) {
-		if(!IPSignShop.getShopManager().isShopSign(loc) && !IPSignShop.getShopManager().isShopChest(loc)) {
+		if(IPSignShop.getShopManager().isNoShopSign(loc) && !IPSignShop.getShopManager().isShopChest(loc)) {
 			return false;
 		}
 		

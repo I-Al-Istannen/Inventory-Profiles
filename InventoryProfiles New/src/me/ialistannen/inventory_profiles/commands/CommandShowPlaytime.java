@@ -1,75 +1,80 @@
 package me.ialistannen.inventory_profiles.commands;
 
-import static me.ialistannen.inventory_profiles.language.IPLanguage.tr;
-
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-
+import me.ialistannen.bukkitutil.commandsystem.base.CommandResultType;
+import me.ialistannen.bukkitutil.commandsystem.implementation.DefaultCommand;
 import me.ialistannen.inventory_profiles.InventoryProfiles;
 import me.ialistannen.inventory_profiles.players.Profile;
 import me.ialistannen.inventory_profiles.util.Util;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import java.time.Duration;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static me.ialistannen.inventory_profiles.util.Util.getAllProfileNames;
+import static me.ialistannen.inventory_profiles.util.Util.tr;
 
 /**
  * Allows the user to see his playtime / the playtime of another user
  */
-public class CommandShowPlaytime extends CommandPreset {
+class CommandShowPlaytime extends DefaultCommand {
 
 	/**
-	 * A new instance of the command
+	 * New instance
 	 */
-	public CommandShowPlaytime() {
-		super("", false);
+	CommandShowPlaytime() {
+		super(InventoryProfiles.getInstance().getLanguage(), "command_show_playtime",
+				Util.tr("command_show_playtime_permission"), sender -> true);
 	}
-	
+
 	@Override
-	public List<String> onTabComplete(int position, List<String> messages) {
-		List<String> toReturn = new ArrayList<>();
-		
-		if(position == 0) {
-			toReturn.addAll(getAllProfileNames());
+	public List<String> tabComplete(CommandSender sender, String alias, List<String> wholeUserChat,
+	                                int indexRelativeToYou) {
+
+		if (indexRelativeToYou == 0) {
+			return getAllProfileNames();
 		}
-		return toReturn;
+
+		return Collections.emptyList();
 	}
-	
+
+
 	@Override
-	public boolean execute(CommandSender sender, String[] args) {
-		
+	public CommandResultType execute(CommandSender sender, String... args) {
+
 		// show own playtime
-		if(sender instanceof Player && !sender.hasPermission(Util.PERMISSION_PREFIX + ".showPlaytime")) {
+		if (sender instanceof Player && !sender.hasPermission(Util.PERMISSION_PREFIX + ".showPlaytime")) {
 			Player player = (Player) sender;
 			Optional<Profile> profile = InventoryProfiles.getProfileManager().getProfile(player.getDisplayName());
-			
-			if(!profile.isPresent()) {
+
+			if (!profile.isPresent()) {
 				sender.sendMessage(tr("not logged in"));
-				return true;
+				return CommandResultType.SUCCESSFUL;
 			}
-			
+
 			sender.sendMessage(tr("show own playtime",
 					Util.formatDuration(profile.get().getPlaytimeLeft()),
 					Util.formatDuration(Duration.ofMillis(profile.get().getPlaytimeModifier()))));
-			return true;
+			return CommandResultType.SUCCESSFUL;
 		}
-		
+
 		Optional<Profile> optProf = InventoryProfiles.getProfileManager().getProfile(args[0]);
 		if (!optProf.isPresent()) {
 			sender.sendMessage(tr("username unknown", args[0]));
-			return true;
+			return CommandResultType.SUCCESSFUL;
 		}
 
 		Profile profile = optProf.get();
-		
+
 		sender.sendMessage(
-				tr("show playtime for other user", 
-						profile.getName(), 
+				tr("show playtime for other user",
+						profile.getName(),
 						Util.formatDuration(profile.getPlaytimeLeft()),
 						Util.formatDuration(Duration.ofMillis(profile.getPlaytimeModifier()))));
-		
-		return true;
+
+		return CommandResultType.SUCCESSFUL;
 	}
 
 }

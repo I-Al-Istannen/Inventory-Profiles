@@ -1,9 +1,12 @@
 package me.ialistannen.inventory_profiles.listener;
 
-import static me.ialistannen.inventory_profiles.language.IPLanguage.tr;
-
-import java.util.Optional;
-
+import me.ialistannen.inventory_profiles.InventoryProfiles;
+import me.ialistannen.inventory_profiles.conversations.ConversationManager.ConversationType;
+import me.ialistannen.inventory_profiles.hooks.RegionHook.RegionObject;
+import me.ialistannen.inventory_profiles.hooks.RegionHook.RegionRole;
+import me.ialistannen.inventory_profiles.players.Profile;
+import me.ialistannen.inventory_profiles.signs.BuySign;
+import me.ialistannen.inventory_profiles.util.Util;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -14,13 +17,9 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.material.Sign;
 
-import me.ialistannen.inventory_profiles.InventoryProfiles;
-import me.ialistannen.inventory_profiles.conversations.ConversationManager.ConversationType;
-import me.ialistannen.inventory_profiles.hooks.RegionHook.RegionObject;
-import me.ialistannen.inventory_profiles.hooks.RegionHook.RegionRole;
-import me.ialistannen.inventory_profiles.players.Profile;
-import me.ialistannen.inventory_profiles.signs.BuySign;
-import me.ialistannen.inventory_profiles.util.Util;
+import java.util.Optional;
+
+import static me.ialistannen.inventory_profiles.util.Util.tr;
 
 /**
  * The Listener to create Buy Signs
@@ -51,7 +50,7 @@ public class BuySignListener implements Listener {
 		}
 		
 		String region = e.getLine(1);
-		if(!InventoryProfiles.getRegionHook().hasRegion(region, e.getBlock().getWorld())) {
+		if(InventoryProfiles.getRegionHook().hasNoRegion(region, e.getBlock().getWorld())) {
 			e.getPlayer().sendMessage(tr("region not valid", e.getLine(1)));
 			return;
 		}
